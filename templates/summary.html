@@ -1,0 +1,25 @@
+<html>
+	<head>
+		<title>summary</title>
+	</head>
+	
+	<body>
+		<h1>hello, Summary.</h1>
+		
+		PV: {{sum}}
+		
+		<div>
+			{% for c in count %}
+				<p>{{c.hour}} - {{c.pv}}</p>
+			{% endfor %}
+		</div>
+		
+	<!--	
+			{% for l in logs %}
+			<p>
+				{{ l }}
+				</p>
+			{% endfor %}
+            -->		
+	</body>
+</html> 

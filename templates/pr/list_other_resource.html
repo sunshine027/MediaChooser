@@ -1,0 +1,42 @@
+{% extends "ad_resource_mgmt/mp_base.html" %}
+{% block rightpanel %}
+    <div id="right"><h2>其他列表页面</h2>
+        <a href="{% url add_other_resource %}">增加</a><br>
+        <table>
+            <tr>
+                <td>属性</td>
+                <td>适合行业类型</td>
+                <td>姓名</td>
+                <td>作品风格</td>
+                <td>所在城市</td>
+                <td>手机</td>
+                <td>邮箱</td>
+                <td>QQ</td>
+                <td>MSN</td>
+                <td>制作时间</td>
+                <td>合作评价</td>
+                <td>其他</td>
+                <td>操作</td>
+            </tr>
+           {% for other_resource in other_resource_list%}
+            <tr>
+                <td>{{ other_resource.attr }}</td>
+                <td>{{ other_resource.industry_type }}</td>
+                <td>{{ other_resource.name }}</td>
+                <td>{{ other_resource.works_style }}</td>
+                <td>{{  other_resource.city}}</td>
+                <td>{{  other_resource.mobile_number }}</td>
+                <td>{{  other_resource.email }}</td>
+                <td>{{  other_resource.qq }}</td>
+                <td>{{  other_resource.msn }}</td>
+                <td>{{  other_resource.making_time }}</td>
+                <td>{{  other_resource.cooperate_evaluation }}</td>
+                <td>{{  other_resource.other_info }}</td>
+                <td><a href="{% url edit_other_resource other_resource.id %}">编辑</a><a href="{% url delete_other_resource other_resource.id %}" onclick="return confirm('确定删除吗?')">删除</a></td>
+            <tr>
+           {% empty %}
+            <tr><td  colspan="13">没有任何数据</td></tr>
+           {% endfor %} 
+       </table>
+    </div>
+{% endblock %}

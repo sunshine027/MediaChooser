@@ -1,0 +1,29 @@
+{% extends "ad_resource_mgmt/mp_base.html" %}
+
+{% block sectionid %}mediainfo{% endblock %}
+
+{% block rightpanel %}
+
+    <div>
+      <h2>媒体信息</h2>
+      <div id="div_mediainfo">
+	<table>
+	  <thead>
+	    <th>媒体名称</th><th>域名</th><th>一级分类</th><th>二级分类</th>
+	  </thead>
+	  <tbody>
+	    {% for media in medias %}
+	    <tr>
+	      <td>{{ media.c_name }}</td>
+	      <td>{{ media.domain }}</td>
+	      <td>{{ media.first_category.c_name }}</td>
+	      <td>{{ media.second_category.c_name }}</td>
+	    </tr>
+	    {% endfor %}
+	  </tbody>
+	</table>
+      </div>
+	
+    </div>
+
+{% endblock %}

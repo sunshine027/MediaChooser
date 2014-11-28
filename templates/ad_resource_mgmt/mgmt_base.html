@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block extrahead %}
+
+    <link href="/media/css/forms.css" rel="stylesheet" type="text/css" media="screen" />
+    <link href="/media-{{ request.path|first_subpath }}/css/demos.css" rel="stylesheet" type="text/css" media="screen" />
+    <link href="/media-{{ request.path|first_subpath }}/css/mc.css" rel="stylesheet" type="text/css" media="screen" />
+
+    <script type="text/javascript" src="/media-{{ request.path|first_subpath }}/js/jquery-1.3.2.min.js"></script>
+    <script type="text/javascript" src="/media-{{ request.path|first_subpath }}/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" src="/media-{{ request.path|first_subpath }}/js/jquery.validate.min.js"></script>
+
+    <script type="text/javascript" src="../../admin/jsi18n/"></script>
+    <script type="text/javascript" src="/media/js/core.js"></script>
+    <script type="text/javascript" src="/media/js/admin/RelatedObjectLookups.js"></script>
+    <script type="text/javascript" src="/media/js/calendar.js"></script>
+    <script type="text/javascript" src="/media/js/admin/DateTimeShortcuts.js"></script>	
+
+{% endblock %}
+
+{% block sectionid %}Ad resource management{% endblock %}
+
+{% block columnwrap %}
+    <div id="mc_nav">
+        <ul>
+            <li>广告资源管理</li>
+            <li>媒体效能分析</li>
+            <li>媒体推荐引擎</li>
+        </ul>
+    </div>
+    
+    <div id="content-main">
+        {% block content %}{% endblock %}
+    </div>
+
+{% endblock %}

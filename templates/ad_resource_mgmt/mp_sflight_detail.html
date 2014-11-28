@@ -1,0 +1,23 @@
+{% extends "ad_resource_mgmt/mp_base.html" %}
+
+{% block rightpanel %}
+
+<div>
+	
+    <table>
+        <tr>
+			<td>媒体</td><td width="400px">频道</td><td width="100px">广告位</td><td width="70px">金额</td>
+			<td width="50px">点击数</td><td width="50px">是否购买</td><td width="200px">开始时间</td>
+			<td width="200px">结束时间</td><td width="200px">tracking code</td>
+		</tr>
+    {% for r in result %}
+    <tr><td>{{ r.media }}</td><td>{{ r.channel }}</td><td>{{ r.adform}}</td><td>{{ r.price }}</td>
+	<td> {{ r.click }}</td><td>{% if r.if_buy %}是{% else %}否{% endif %}</td><td>{{ r.start_day }}</td>
+	<td>{{ r.end_day }}</td><td>{{ r.de_ad_id }}</td></tr>
+
+    {% endfor %}
+    </table>
+</div>
+
+
+{% endblock %}

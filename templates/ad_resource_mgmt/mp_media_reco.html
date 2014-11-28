@@ -1,0 +1,584 @@
+{% extends "ad_resource_mgmt/mp_base.html" %}
+{% load filters_extra %}
+{% block sectionid %}media_reco{% endblock %}
+
+<style>
+.industrybox {
+	font: 12px Tahoma, Arial, Helvetica, sans-serif;
+	text-decoration: none;
+	outline: none;a
+	height: 16px;
+	width: 40px;
+	display: block;
+	float: left;
+	padding: 1px 0px 0px 20px;
+	color: red;
+}
+</style>
+
+{% block rightpanel %}
+<h2>媒体推荐引擎</h2>
+
+<div id="div_filter">
+  <table width="100%">
+    <thead>
+      <th width="18%"><h3>选择指标</h3></th>
+      <th width="18%" title="留空则选择所有客户"><h3>选择客户</h3></th>
+      <th width="18%" title="留空则选择所有时段"><h3>选择时间段</h3></th>
+      <th width="18%"><h3>选择查看级别</h3></th>
+      <th width="28%" title="留空则选择所有类别"><h3>选择类别</h3></th>
+    </thead>
+    <tbody>
+      <tr>
+	<td>
+	  <div id="settarget">
+	    <input type="radio" name="target" value="cpc" checked>CPC</input><br />
+	    <input type="radio" name="target" value="cpa" >CPA</input><br />
+	    <input type="radio" name="target" value="cpm" >CPM</input><br />
+	    <input type="radio" name="target" value="others">其它</input><br />
+	    返回<input id="num_result" type="tex" size=2 name="num" value="10"></input>个结果<br />
+	  </div>
+	</td>
+	<td>
+	  <p><button id="choose_client" class="ui-button ui-state-default ui-corner-all">选择客户</button></p>
+	  <div id="clients_filter" title="选择客户" style="background:#eee;border:1px solid #ccc;display:none;z-index:1002;">
+	    {% for k,v in clients_dict.items %}
+	    <p><input type="checkbox" class="industrybox" id="{{k}}"><b>&nbsp;{{ k }}</b></input><br>
+	      &nbsp;&nbsp;&nbsp;&nbsp;
+	      {% for c in v %}
+	      <input type="checkbox" class="clientbox" id="{{c.id}}">&nbsp;{{ c }}&nbsp;
+	      {% endfor %}
+	    </p>
+	    {% endfor %}
+	  </div>
+	</td>
+	<td>
+	  <form action="" method="post">
+	  	{% csrf_token %}
+	    <p>{{ form.start_day.errors }}<label for="start_day">开始日期: </label>{{ form.start_day }}</p>
+	    <p>{{ form.end_day.errors }}<label for="end_day">结束日期: </label>{{ form.end_day }}</p>
+	  </form>
+	</td>
+	<td>
+	  <div id="setlevel">
+	    <input type="radio" name="level" value="media" checked>媒体</input><br>
+	    <input type="radio" name="level" value="channel">频道</input>
+	  </div>
+	</td>
+	<td>
+	  <div id="div_cate1">
+	    <select id="categy1" size="10">
+	      <option  value="all">全部类别</option>
+	      {% for nilsen in nielsencateg %}
+	      <option  value="{{nilsen.id}}">{{nilsen.c_name}}</option>
+	      {% endfor %}
+	    </select> 
+	  </div>
+	  <div id="div_cate2">
+	    <select id="categy2"  multiple="multiple" style="display:none">
+	      <option value=""></option>
+	    </select> 
+	  </div>
+	</td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="p_confirm"><button id="button_mediareco">推荐查询</button></p>
+</div>
+<div style="clear: both;"></div>
+
+<div id="loading" style="display:none;"><img src="/files_dl/loading.gif" /></div>
+
+<div id="message">
+</div>
+
+<div>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+</div>
+
+<div id='amchart_cpc_media'>
+	</div>
+<!--
+<div id="chart" style="z-index:50;">		
+</div>
+	
+	
+<div class="indent2">
+	<button class="ui-button ui-state-default ui-corner-all" id="linechartbutton" type="button">线状图</button>
+	<button class="ui-button ui-state-default ui-corner-all" id="barchartbutton" type="button">柱状图</button>
+	<button class="ui-button ui-state-default ui-corner-all" id="saveimage" onclick="javascript:save_image()" type="button">保存为图片</button>
+</div>
+-->
+<div id="cpc_details_info">
+<!--
+<div id="cpc_details_info" style="display:none;z-index:50">
+
+<div id="resize">
+	<div id="_chart"></div>
+</div>
+-->
+<div id="amchart_channel"></div>
+</div>
+<div id="media_channel_info">
+<!--
+
+	<div id="resize">
+		<div id="chart_channel"></div>
+	</div>
+-->
+	<div id="amchart_flight"></div>
+</div>	
+{% endblock %}
+
+
+{% block js %}
+<style type="text/css">
+	#resize {width: 700px; height: 400px; padding: 10px; }
+	#resize h3 {text-align: center; margin:0;}
+</style>
+
+<script type="text/javascript" src="/media-{{ request.path|first_subpath }}/js/swfobject.js"></script>
+<script type="text/javascript" src="/media-{{ request.path|first_subpath }}/js/amswfobject.js"></script>
+<script type="text/javascript" src="/media-{{ request.path|first_subpath }}/js/json2.js"></script>
+
+<script type="text/javascript">
+	//var flashvars = {};  
+	//var params = {wmode:"opaque"};
+	//swfobject.embedSWF("/files_dl/open-flash-chart.swf", "chart", "700", "400", "9.0.0", "", flashvars, params,{});
+	//swfobject.embedSWF("/files_dl/open-flash-chart.swf", "_chart", "100%", "100%", "9.0.0","expressInstall.swf",{"get-data":"get_data_media_channel_cpc"});
+	//swfobject.embedSWF("/files_dl/open-flash-chart.swf", "chart_channel", "710", "400", "9.0.0","expressInstall.swf",{"get-data":"get_data_media_channel_cpc"});
+	
+	
+	var so_cpc_media = new SWFObject("/media-{{ request.path|first_subpath }}/amchart/swf/amcolumn.swf",'media','800','400','8', '#FFFFFF');
+	so_cpc_media.addVariable('settings_file', encodeURIComponent('/media-{{ request.path|first_subpath }}/amchart/settings/amcolumn_settings.xml'));
+	so_cpc_media.addVariable('data_file', encodeURIComponent('/media-{{ request.path|first_subpath }}/amchart/data/empty_data.xml'));
+	so_cpc_media.addVariable('chart_id', 'media');
+	so_cpc_media.addVariable("loading_settings", "sdfsdf");
+	so_cpc_media.addVariable("loading_data", "LOADING...");
+	so_cpc_media.addParam("wmode", "opaque");
+	so_cpc_media.write('amchart_cpc_media');
+	
+	var so_cpc_media = new SWFObject("/media-{{ request.path|first_subpath }}/amchart/swf/amcolumn.swf",'channel','800','400','8', '#FFFFFF');
+	so_cpc_media.addVariable('settings_file', encodeURIComponent('/media-{{ request.path|first_subpath }}/amchart/settings/amcolumn_settings.xml'));
+	so_cpc_media.addVariable('data_file', encodeURIComponent('/media-{{ request.path|first_subpath }}/amchart/data/empty_data.xml'));
+	so_cpc_media.addVariable('chart_id', 'channel');
+	so_cpc_media.addParam("wmode", "opaque");
+	so_cpc_media.write('amchart_channel');
+	
+	var so_cpc_media = new SWFObject("/media-{{ request.path|first_subpath }}/amchart/swf/amcolumn.swf",'flight','800','400','8', '#FFFFFF');
+	so_cpc_media.addVariable('settings_file', encodeURIComponent('/media-{{ request.path|first_subpath }}/amchart/settings/amcolumn_settings.xml'));
+	so_cpc_media.addVariable('data_file', encodeURIComponent('/media-{{ request.path|first_subpath }}/amchart/data/empty_data.xml'));
+	so_cpc_media.addVariable('chart_id', 'flight');
+	so_cpc_media.addParam("wmode", "opaque");
+	so_cpc_media.write('amchart_flight');
+	
+	
+	var flashMovie = new Object();
+	
+	function amChartInited(chart_id){
+    	flashMovie[chart_id] = document.getElementById(chart_id);
+		//alert(chart_id);
+	}
+	
+	function reload_data(obj){
+		//alert(obj+':before');
+		if (flashMovie[obj]){
+			//alert(obj+':after');
+			flashMovie[obj].reloadData('/media-{{ request.path|first_subpath }}/amchart/data/mediareco_cpc_'+ obj +'.xml')
+		}
+	}
+	
+	function reset_data(obj){
+		if (flashMovie[obj]){
+			//alert(obj+':after');
+			flashMovie[obj].reloadData('/media-{{ request.path|first_subpath }}/amchart/data/empty_data.xml')
+		}
+	}
+	
+	function amClickedOnBullet(chart_id, graph_index, value, series, url, description){
+		
+	}
+	
+</script>
+
+<script type="text/javascript">
+	init_data = {{ init_data|safe }}  
+
+	var cpc_media_channe_line = {{init_media_channel_data|safe}}
+
+	function get_data_media_channel_cpc(){
+		return JSON.stringify(cpc_media_channe_line);
+	}
+
+	function ofc_ready(){
+	}
+	
+	function open_flash_chart_data(){
+			return JSON.stringify(init_data);
+		}
+	
+	function findSWF(movieName){
+  		if (navigator.appName.indexOf("Microsoft")!= -1) {
+			return window[movieName];} 
+		else {
+			return document[movieName];
+			}
+	}
+
+	function load_chart(data){
+		tmp = findSWF("chart");
+		x = tmp.load(data);
+	}
+
+	function load_init(){
+		tmp = findSWF("chart");
+		tmp.load(JSON.stringify(init_data));
+	}
+
+
+	OFC = {};
+	
+	OFC.jquery = {
+    name: "jQuery",
+    version: function(src) { return $('#'+ src)[0].get_version() },
+    rasterize: function (src, dst) { $('#'+ dst).replaceWith(OFC.jquery.image(src)) },
+    image: function(src) { return "<img src='data:image/png;base64," + $('#'+src)[0].get_img_binary() + "' />"},
+    popup: function(src) {
+			var img_win = window.open('', 'Charts: Export as Image')
+		    with(img_win.document) {
+            write('<html><head><title>Charts: Export as Image</title></head><body>' + OFC.jquery.image(src) + '</body></html>') }
+			// stop the 'loading...' message
+			img_win.document.close();
+		 }
+	}
+	
+	if (typeof(Control == "undefined")) {var Control = {OFC: OFC.jquery}}
+ 
+	// By default, right-clicking on OFC and choosing "save image locally" calls this function.
+	// You are free to change the code in OFC and call my wrapper (Control.OFC.your_favorite_save_method)
+	// function save_image() { alert(1); Control.OFC.popup('my_chart') }
+	function save_image() {OFC.jquery.popup('chart') }
+	function moo() { alert(99); 
+	
+	};	
+
+	var temp_line_up = null;
+	var temp_bar_up = null;	
+
+	$(document).ready(function(){
+		
+		$("#resize").resizable({
+			minHeight: 180,
+			minWidth: 320,
+		});
+		
+		$("#clients_filter").dialog({
+			bgiframe: true,
+			autoOpen: false,
+			height: 500,
+			width:700,
+			modal: true,
+			buttons: {
+				'清空': function() {		
+					$(":checkbox").each(function(){
+						 this.checked = false;
+						 $(this).attr('disabled', false);
+					});					
+				},
+				'全选': function() {
+					$("#clients_filter .clientbox").each(function(){
+						 this.checked = true;
+					});					
+				},
+				'确定': function() {
+					$(this).dialog('close');
+				}
+			},
+			close: function() {
+				//allFields.val('').removeClass('ui-state-error');
+			}
+		});
+
+		$('#choose_client').click(function() {
+			if ($('#clients_filter').dialog('isOpen'))
+			{
+				$('#clients_filter').dialog('moveToTop');
+			}
+			else{
+			$('#clients_filter').dialog('open');
+			}
+		})
+		.hover(
+			function(){ 
+				$(this).addClass("ui-state-hover"); 
+			},
+			function(){ 
+				$(this).removeClass("ui-state-hover"); 
+			}
+		).mousedown(function(){
+			$(this).addClass("ui-state-active"); 
+		})
+		.mouseup(function(){
+				$(this).removeClass("ui-state-active");
+		});
+
+		
+		$("#id_start_day").datepicker();
+		$('#id_start_day').datepicker('option', {dateFormat: 'yy-mm-dd'});
+		$("#id_end_day").datepicker();
+		$('#id_end_day').datepicker('option', {dateFormat: 'yy-mm-dd'});
+
+		function get_boxes(){
+		    var str=""			
+			$("#clients_filter .clientbox").each(function(){
+				if ( this.checked == true){
+					str+=this.id+",";
+				}
+			});
+			return str;
+		};
+		
+		function get_cats(){
+			var cat_id = null;
+			has_cat_1 = $("#categy1 option:selected").length;
+			has_cat_2 = $("#categy2 option:selected").length;
+			if (has_cat_1 && !has_cat_2){
+				//alert($("#categy1 option:selected").val());
+				cat_id = 'a-' + $("#categy1 option:selected").val();
+			}
+			if(has_cat_1 && has_cat_2){
+				//alert($("#categy2 option:selected").val());
+				cat_id = 'b-' + $("#categy2 option:selected").val();
+			}
+			return cat_id
+		};
+		
+		$("#button_mediareco").click(function(){
+
+			$('#chart').show(100);
+			//$('#cpc_details_info').hide();
+			//$('#media_channel_info').hide();
+			get_boxes();
+			cat_id = get_cats();
+			path = location.pathname.split('/');
+			path[path.length-2] = 'get_mediareco';
+			start_day = $("#id_start_day").val();
+			end_day = $("#id_end_day").val();
+			target= $("#settarget input:radio[checked=true]").val();
+			level = $("#setlevel input:radio[checked=true]").val();
+			num = $("#num_result").val();
+			
+			if (level=='media')
+			{
+				$('#cpc_details_info').show();
+				reset_data('channel');
+				reset_data('flight');
+			}
+			
+			if (level=='channel'){
+				$('#cpc_details_info').hide();
+				reset_data('flight');
+			}
+			
+			$("#loading").ajaxStart(function(){
+				$(this).show();
+			});
+			
+			$("#loading").ajaxStop(function(){
+				$(this).hide();
+			});
+			
+			if (get_boxes == ''){
+				clients_list = ''
+			}
+			else{
+				clients_list = get_boxes();
+			}
+			
+			$.getJSON(path.join('/'), {start_day:start_day,end_day:end_day,target:target,level:level,num:num,cat_id:cat_id,clients_list:clients_list}, function(data){
+				if (data.success == false)
+				{	
+
+					$("#message").empty();					
+					$("#message").append("<br>没有相关的媒体<br>");
+					reset_data('media');
+				}
+				else
+				{	
+					$("#message").empty();
+					//load_chart(data.media_reco_chart_bar);
+//					load_chart(ss);
+					temp_line_up = data.media_reco_chart_line;
+					temp_bar_up = data.media_reco_chart_bar;
+					reload_data('media');
+				}
+			},'json');
+			
+		});
+		
+		$("#linechartbutton").click(function(){	
+			if (temp_line_up != null)
+			{
+				load_chart(temp_line_up);
+			}
+		});
+
+		$("#barchartbutton").click(function(){
+			if (temp_bar_up != null)
+			{
+				load_chart(temp_bar_up);
+			}
+		});
+
+		var aa = function(){
+				$("#categy1").change(function () {
+						  var str = "";
+						  path = location.pathname.split('/');
+						  path[path.length-2] = 'get_mediacats';
+						  $("#categy1 option:selected").each(function () {
+								str += $(this).val() + " ";
+							  });
+
+						  $.ajax({
+							type: "get",
+							dataType: "json",
+							url: path.join('/'),
+							global: false, // 设置为非全局事件，以免被上面的loading捕捉到
+							data: "nilsen_id=" + str.replace('%2029','').replace('%208',''),
+							success: function(msg){
+								var _data = msg;
+
+								if (_data ==null || _data==""){
+									$('#categy2').hide(100);
+								}
+								else{
+									$('#categy2').show(100);
+									 var  categy2 = document.getElementById('categy2');
+										for(i=0;i<_data.length;i++){  
+											categy2.options[i] = new Option();  
+											categy2.options[i].text = _data[i].c_name;  
+											categy2.options[i].value = _data[i].id;
+										 } 
+								}
+						    }
+							});
+
+						}).trigger('change');
+
+						$('#sbmt').click(function(){
+							has_cat_1 = $("#categy1 option:selected").length;
+							has_cat_2 = $("#categy2 option:selected").length;
+							if (has_cat_1 && !has_cat_2){
+								//alert($("#categy1 option:selected").val());
+								}
+							if(has_cat_1 && has_cat_2){
+								 //alert($("#categy2 option:selected").val());
+							}
+				});
+				
+
+				$("#categy2").change(function () {
+					var str = "";
+						  $("#categy2 option:selected").each(function () {
+								str += $(this).val() + " ";
+							  });
+				});
+				
+
+				$(".industrybox").click(function(){
+							target = $(this).parent().find(".clientbox")
+							if(this.checked){
+								target.attr('disabled', true).attr('checked', true);
+							}
+							else{
+								target.attr('disabled', false).attr('checked', false);
+							}
+				});
+
+		}			
+		
+		$(aa);
+			
+	});
+
+	function bar_1(a){
+		//$('#loading2').empty().append($("#cpc_details_info").html()).show();
+		//$('#cpc_details_info').show();
+		//$('#media_channel_info').hide();
+		//$('#media_channel_info').show();
+		var temp =a ;
+		//_index = temp.indexOf('<br>');
+		//if (_index != -1){
+	//			$('#cpc_details_info').hide();
+	//			bar_2(temp.substring(_index+4,temp.length),temp.substring(0,_index));
+	//		}
+
+		level = $("#setlevel input:radio[checked=true]").val();
+		if (level == 'media'){
+			//$('#media_channel_info').hide();
+			//alert(clients_list);
+			$.ajax({
+				type: "post",
+				dataType: "json",
+				url: path.join('/'),
+				global: false, // 设置为非全局事件，以免被上面的loading捕捉到
+				data: "media_id=" + a + '&clients_list=' + clients_list + '&start_day=' + start_day + '&end_day=' + end_day,
+				timeout: 6000,
+				success: function(data){
+						//var tmp1 =  findSWF("_chart");
+						//tmp1.load(JSON.stringify(data));
+						reload_data('channel');
+						reset_data('flight');
+					}
+			});
+
+		}
+		else{
+
+			$('#cpc_details_info').hide();
+			//$('#media_channel_info').show();
+
+			$.ajax({
+
+				type: "post",
+				dataType: "json",
+				url: path.join('/'),
+				//data: "channel_id=" + channel_id  +"&media_id=" + meida_id,
+				global: false, // 设置为非全局事件，以免被上面的loading捕捉到
+				data: "channel_id=" + a + '&clients_list=' + clients_list + '&start_day=' + start_day + '&end_day=' + end_day,
+				timeout: 6000,
+				success: function(data){
+						//var tmp2 =  findSWF("chart_channel");
+						//tmp2.load(JSON.stringify(data));
+						reload_data('flight');
+					}
+			});
+		}		
+	}
+
+
+		
+	function bar_2(channel_id,meida_id){
+		//$('#media_channel_info').show();
+		$.ajax({
+				type: "post",
+				dataType: "json",
+				url: path.join('/'),
+				global: false, // 设置为非全局事件，以免被上面的loading捕捉到
+				data: "channel_id=" + channel_id  +"&media_id=" + meida_id + '&clients_list=' + clients_list + '&start_day=' + start_day + '&end_day=' + end_day,
+				timeout: 6000,
+				success: function(data){
+						//var tmp =  findSWF("chart_channel");
+						//var x = tmp.load(JSON.stringify(data));
+						reload_data('flight');
+					}
+		});
+	}
+
+</script>
+
+
+
+
+{% endblock %}

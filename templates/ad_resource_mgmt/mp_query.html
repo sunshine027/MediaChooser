@@ -1,0 +1,126 @@
+{% extends "ad_resource_mgmt/mp_base.html" %}
+
+{% block sectionid %}mp_query{% endblock %}
+
+{% block rightpanel %}
+
+<h2>排期查询</h2>
+<div class="div_query">
+<!-- <form action="" method="post"> -->
+	{{ form.campaign_id.errors }}<label for="id_campaign_id" title="DC里的排期ID">排期号: </label>{{ form.campaign_id }}{{msg}}
+	<p class="p_query"><button id="campaign_id_submit">提交查询</button></p>
+	<div style="clear: both;"></div>
+<!-- </form> -->
+</div>
+<div id="dialog" title="错误" style="display:none">
+	<p>
+		<span class="ui-icon ui-icon-closethick" style="float:left; margin:0 7px 50px 0;"></span>
+		您所查找的排期不存在.
+	</p>
+</div>
+<div id="noperm_dialog" title="错误" style="display:none">
+	<p>
+		<span class="ui-icon ui-icon-closethick" style="float:left; margin:0 7px 50px 0;"></span>
+		您没有权限查看此排期.
+	</p>
+</div>
+
+
+<div class="div_query">
+  <form action="query_mflights/" method="post">
+    <table>
+      <thead></thead>
+      <tbody>
+	<tr><td width="10%">{{ form_m.client.errors }}<label for="id_client">广告主: </label></td><td>{{ form_m.client }}</td></tr>
+	<tr><td>{{ form_m.activitytype.errors }}<label for="id_activitytype">活动类型: </label></td><td>{{ form_m.activitytype }}</td></tr>
+	<tr><td>{{ form_m.campaign_name.errors }}<label for="id_campaign_name">排期名: </label></td><td>{{ form_m.campaign_name }}</td></tr>
+	<tr><td>{{ form_m.start_day.errors }}<label for="start_day">开始日期: </label></td><td>{{ form_m.start_day }}</td></tr>
+	<tr><td>{{ form_m.end_day.errors }}<label for="end_day">结束日期: </label></td><td>{{ form_m.end_day }}</td></tr>
+      </tbody>
+    </table>
+    <p class="p_query"><button id="campaign_name_submit">提交查询</button></p>
+    <div style="clear: both;"></div>
+	{% csrf_token %}
+  </form>
+</div>
+<!-- <FORM METHOD="post" ACTION="query">form_flightschooser
+	{{ form_flightschooser.industry.errors }}<label for="id_industry">所属行业: </label>
+	{{ form_flightschooser.industry }}
+	<p><input id="flightschooser_submit" type="submit" value="提交查询" /></p>
+</FORM> -->
+{% endblock %}
+
+
+{% block js %}
+<script type="text/javascript" src="/files_dl/js/jquery-ui-1.7.2.custom.min.js"></script>
+<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/redmond/jquery-ui.css" type="text/css" media="all" />
+
+<script type="text/javascript">
+			
+	$(document).ready(function(){
+		$("#campaign_id_submit").click(function(){
+			
+			cid = $("#id_campaign_id").attr('value')
+
+			if (cid == '')
+			{
+				alert('请输入排期id');
+				return false;
+			}
+			
+			path = location.pathname.split('/');
+			//alert(location.pathname);
+			path[path.length-1] = 'query';
+			$.getJSON(location.pathname, {cid:cid}, function(data){
+				if (data.url == false)
+				{	
+					$("#dialog").dialog({
+						bgiframe: true,
+						modal: true,
+						resizable: false,
+						buttons: {
+							Ok: function() {
+							$(this).dialog('destroy');
+							}
+						}
+					});
+				}
+				else if (data.url == 'noperm'){
+					$("#noperm_dialog").dialog({
+						bgiframe: true,
+						modal: true,
+						resizable: false,
+						buttons: {
+							Ok: function() {
+							$(this).dialog('destroy');
+							}
+						}
+					});
+				}
+				else
+				{	
+					window.location = data.url;
+				}
+			},'json');
+		});
+		
+		$("#id_start_day").datepicker();
+		$('#id_start_day').datepicker('option', {dateFormat: 'yy-mm-dd'});
+		$("#id_end_day").datepicker();
+		$('#id_end_day').datepicker('option', {dateFormat: 'yy-mm-dd'});
+		
+		
+
+		/*$("#campaign_name_submit").click(function(){
+			
+			if ($("#id_campaign_name").attr('value') == '')
+			{
+				alert('请输入排期名');
+				return false;
+			}
+		});*/
+
+	});
+
+</script>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "ad_resource_mgmt/mp_base.html" %}
+
+{% block rightpanel %}
+
+<form action="" method="post">
+	{% csrf_token %}
+	<P>
+		<input id="mflights" type="submit" value="多排期比较"></input>
+		<input id="date" type="submit" value="时间趋势"></input>
+		<input id="media" type="submit" value="媒体效果"></input>
+	</P>
+</form>
+
+
+<h3 class="title">多排期效果</h3> 
+<p class="indent2">
+	<a id="cpc_mflights" href="#">多排期效果(单击关闭/展开)</a>
+		<div id="cpc_mflights_chart"></div>
+</p>
+{% endblock %}
+
+{% block js %}
+<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/ui-lightness/jquery-ui.css" type="text/css" media="all" />
+
+<script type="text/javascript" src="/files_dl/swfobject.js"></script>
+<script type="text/javascript" src="/files_dl/json2.js"></script>
+<script type="text/javascript" src="/files_dl/js/jquery-ui-1.7.2.custom.min.js"></script>
+
+<script type="text/javascript">
+	swfobject.embedSWF("/files_dl/open-flash-chart.swf", "cpc_mflights_chart", "1000px", "400px", "9.0.0");
+</script>
+
+<script type="text/javascript">
+	
+	var cpc_mflights = {{ cpc_mflights_chart|safe }};
+	
+	function ofc_ready(){
+	}
+	
+	
+	function open_flash_chart_data(){	
+			return JSON.stringify(cpc_mflights);
+		}
+	
+	function findSWF(movieName){
+  		if (navigator.appName.indexOf("Microsoft")!= -1) {
+			return window[movieName];} 
+		else {
+			return document[movieName];
+			}
+	}
+		
+	$(document).ready(function(){
+		
+
+		$("#cpc_mflights").toggle(
+      		function () { $("#cpc_mflights_chart").hide();},
+      		function () { $("#cpc_mflights_chart").show();}
+		);
+		
+		$(":submit").click(function(){
+			url = '../mflights/?source=' + this.id + '&data=';
+			{% for d in campaign_id %}
+				{% if forloop.last %}
+					url += {{d}}
+				{% else %}
+					url += {{d}} + ','
+				{% endif %}
+			{% endfor %}
+			this.form.action = url;
+		});
+	});
+</script>
+{% endblock %}

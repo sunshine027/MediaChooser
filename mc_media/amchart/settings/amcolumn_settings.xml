@@ -1,0 +1,46 @@
+<settings>
+  <decimals_separator>.</decimals_separator>
+  <preloader_on_reload>1</preloader_on_reload>
+  <background>
+    <alpha>100</alpha>
+    <border_alpha>20</border_alpha>
+  </background>
+  <grid>
+    <category>
+      <dashed>1</dashed>
+    </category>
+    <value>
+      <dashed>1</dashed>
+    </value>
+  </grid>
+  <axes>
+    <category>
+      <width>1</width>
+      <color>E7E7E7</color>
+    </category>
+    <value>
+      <width>1</width>
+      <color>E7E7E7</color>
+    </value>
+  </axes>
+  <values>
+    <value>
+      <min>0</min>
+    </value>
+  </values>
+  <depth>15</depth>
+  <column>
+    <width>85</width>
+    <balloon_text>{series}cpc: {value}</balloon_text>
+	<hover_color>FF3366</hover_color>
+    <grow_time>3</grow_time>
+  </column>
+  <graphs>
+    <graph gid="1">
+      <title>cpc</title>
+      <color>7F8DA9</color>
+<data_labels>{value}</data_labels>
+    </graph>
+  </graphs>
+  
+</settings>

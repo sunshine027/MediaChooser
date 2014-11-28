@@ -1,0 +1,82 @@
+{% extends "ad_resource_mgmt/mp_base.html" %}
+{% load filters_extra %}
+{% block rightpanel %}
+
+<form action="" method="post">
+	{% csrf_token %}
+	<P>
+		<input id="mflights" type="submit" value="多排期比较"></input>
+		<input id="date" type="submit" value="时间趋势"></input>
+		<input id="media" type="submit" value="媒体效果"></input>
+	</P>
+</form>
+
+<h3 class="title">
+{% for c in campaign_id %}
+
+	{% if forloop.last %}
+		{{c}}
+	{% else %}
+		{{c}},
+	{% endif %}
+{% endfor %}号排期cpc时间趋势
+</h3>
+<!--
+<p>
+	 <a id="cpc_timeseries" href="#">时间趋势比较(单击关闭/展开)</a> 
+	<div id="cpc_timeseries_chart"></div>
+	
+</p>
+-->
+<div id="cpc_timeseries_amchart"></div>
+
+
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="/files_dl/swfobject.js"></script>
+<script type="text/javascript" src="/files_dl/amswfobject.js"></script>
+<script type="text/javascript" src="/files_dl/json2.js"></script>
+<script type="text/javascript">
+	//swfobject.embedSWF("/files_dl/open-flash-chart.swf", "cpc_timeseries_chart", "900", "300", "9.0.0");
+	
+	var so_cpc_timeseries = new SWFObject("/media-{{ request.path|first_subpath }}/amchart/swf/amline.swf",'amline','800','400','8', '#FFFFFF');
+	so_cpc_timeseries.addVariable('settings_file', encodeURIComponent('/media-{{ request.path|first_subpath }}/amchart/settings/amline_settings.xml'));
+	so_cpc_timeseries.addVariable('data_file', encodeURIComponent('/media-{{ request.path|first_subpath }}/amchart/data/cpc_timeseries.xml'));
+	so_cpc_timeseries.write('cpc_timeseries_amchart');
+</script>
+
+<script type="text/javascript">
+	
+	var cpc_date_chart = {{ cpc_date_chart|safe }};
+	
+	function ofc_ready(){
+	}
+	
+	function open_flash_chart_data(){		
+			return JSON.stringify(cpc_date_chart);
+		}
+	
+	function findSWF(movieName){
+  		if (navigator.appName.indexOf("Microsoft")!= -1) {
+			return window[movieName];} 
+		else {
+			return document[movieName];
+			}
+	}
+		
+	$(document).ready(function(){
+		$(":submit").click(function(){
+			url = '../mflights/?source=' + this.id + '&data=';
+			{% for d in campaign_id %}
+				{% if forloop.last %}
+					url += {{d}}
+				{% else %}
+					url += {{d}} + ','
+				{% endif %}
+			{% endfor %}
+			this.form.action = url;
+		});
+	});
+</script>
+{% endblock %}

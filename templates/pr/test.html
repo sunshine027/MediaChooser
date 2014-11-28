@@ -1,0 +1,52 @@
+{% load filters_extra %}
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh" lang="zh">
+    <head>
+        <script type="text/javascript" src="/media-{{ request.path|first_subpath }}/js/jquery-1.3.2.min.js"></script>
+        <script type="text/javascript" src="/media-{{ request.path|first_subpath }}/fusioncharts/js/FusionCharts.js"></script>
+        <script type="text/javascript" src="/media-{{ request.path|first_subpath }}/fusioncharts/js/FusionChartsExportComponent.js"></script>
+        
+        <script type="text/javascript">
+            
+            $().ready(function(){
+            
+                var price_media_chart = new FusionCharts("/media-{{ request.path|first_subpath }}/fusioncharts/charts/Pie2D.swf", "myChartId", "425", "350", "0", "0");
+               price_media_chart.setJSONUrl("{% url get_chart_api campaign_id 'media_price_pie' %}");
+               price_media_chart.render("price_media_chart");
+                
+                var myExportComponent = new FusionChartsExportObject("fcExporter1", "/media-{{ request.path|first_subpath }}/fusioncharts/charts/FCExporter.swf");
+    
+                //Render the exporter SWF in our DIV fcexpDiv
+                myExportComponent.Render("fcexpDiv");
+            });
+            
+
+        </script>
+    </head>
+    <body>
+        <div id="price_media_chart">
+            The chart will appear within this DIV. This text will be replaced by the chart.
+        </div>
+        <div id="fcexpDiv" align="center">FusionCharts Export Handler Component</div>
+        <form action="" method="post" id="loginform">
+            username: <input type="text" id="username" name="userName"/>
+            password: <input type="text" id="password" name="password"/>
+            <input type="submit" name="dd" value="ok"/>
+       </form>
+       <form action="" method="post" enctype="multipart/form-data">
+       name: {{form.name }}
+       photo: {{ form.photo }}
+       <input type="submit" name="dd" value="ok"/>
+       </form>
+       country: <select id="id_country">
+       <option>北京</option>
+       <option>广州</option>
+       <option>上海</option>
+       </select>
+       longitude: <input type="text" id="id_longitude"/>
+       latitude: <input type="text" id="id_latitude"/>
+       <input type="hidden" id="fetch_geodata_url"/>
+    </body>
+</html>

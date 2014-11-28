@@ -1,0 +1,2 @@
+function getUrlPara(paraName){new RegExp("(?:\\?|&){1}"+paraName+"=([^&]*)","gi").exec(location.href);return RegExp.$1;}
+var ngAdID = getUrlPara('ngAdID');if (ngAdID != ''){document.write(unescape("%3Ciframe style='display:none' src='http://211.94.190.88/dl-dev-ad/ad-res-mgmt/jstest/?ngAdID="+ngAdID+"'%3E%3C/iframe%3E"));}

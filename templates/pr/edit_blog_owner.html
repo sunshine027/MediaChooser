@@ -1,0 +1,81 @@
+{% extends "ad_resource_mgmt/mp_base.html" %}
+{% block rightpanel %}
+    <div id="right"><h2>编辑博主页面</h2>
+        {{ blog_owner_form.errors }}
+        <form action="{% url edit_blog_owner blog_owner_id %}" method="post">
+            <table>
+                <tr>
+                    <td>博客名称: </td>
+                    <td>{{ blog_owner_form.blog_name }}</td>
+                </tr>
+                <tr>
+                    <td>博主姓名: </td>
+                    <td>{{ blog_owner_form.name }}</td>
+                </tr>
+                <tr>
+                    <td>博主属性: </td>
+                    <td>{{ blog_owner_form.attr }}</td>
+                </tr>
+                <tr>
+                    <td>内容行业类型: </td>
+                    <td>{{ blog_owner_form.content_industry_type }}</td>
+                </tr>
+                <tr>
+                    <td>博客流量: </td>
+                    <td>{{ blog_owner_form.blog_flow }}</td>
+                </tr>
+                <tr>
+                    <td>博客链接: </td>
+                    <td>{{ blog_owner_form.blog_link }}</td>
+                </tr>
+                <tr>
+                    <td>媒体名称: </td>
+                    <td>{{ blog_owner_form.media_name }}</td>
+                </tr>
+                <tr>
+                    <td>博主写作风格: </td>
+                    <td>{{ blog_owner_form.writing_style }}</td>
+                </tr>
+                <tr>
+                    <td>博主手机: </td>
+                    <td>{{ blog_owner_form.mobile }}</td>
+                </tr>
+                <tr>
+                    <td>邮箱: </td>
+                    <td>{{ blog_owner_form.email }}</td>
+                </tr>
+                <tr>
+                    <td>qq: </td>
+                    <td>{{ blog_owner_form.qq }}</td>
+                </tr>
+                <tr>
+                    <td>msn: </td>
+                    <td>{{ blog_owner_form.msn }}</td>
+                </tr>
+                <tr>
+                    <td>撰写时间: </td>
+                    <td>{{ blog_owner_form.writing_time }}</td>
+                </tr>
+                <tr>
+                    <td>博主简介: </td>
+                    <td>{{ blog_owner_form.introduction }}</td>
+                </tr>
+                <tr>
+                    <td>合作评价: </td>
+                    <td>{{ blog_owner_form.cooperate_evaluation }}</td>
+                </tr>
+                <tr>
+                    <td>优势: </td>
+                    <td>{{ blog_owner_form.advantage }}</td>
+                </tr>
+                <tr>
+                    <td>其他: </td>
+                    <td>{{ blog_owner_form.other_info }}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><input type="submit" value="增加"/></td>
+                </tr>
+            </table>
+        </form>
+    </div>
+{% endblock %}

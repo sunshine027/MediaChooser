@@ -1,0 +1,89 @@
+{% extends "ad_resource_mgmt/mp_base.html" %}
+{% load filters_extra %}
+{% block rightpanel %}
+    <div id="right"><h2>版主列表页面</h2>
+        <a href="{% url add_moderator %}">增加</a><br>
+         <form action="{% url batch_add_moderator_by_excel %}" method="post" id="moderator_form" enctype="multipart/form-data">
+            上传版主: <input type="file" id="moderator_file" name="moderator_file">
+            <input type="button" onclick="submitForm()" value="确定"/>
+            {{ ret.msg }}
+        </form>
+        <table>
+            <tr>
+                <td>行业类型</td>
+                <td>BBS类型</td>
+                <td>媒体名称</td>
+                <td>频道</td>
+                <td>BBS版块</td>
+                <td>BBS链接</td>
+                <td>Alexa排名</td>
+                <td>版块优势</td>
+                <td>版主ID</td>
+                <td>真实姓名</td>
+                <td>手机</td>
+                <td>邮箱</td>
+                <td>QQ</td>
+                <td>MSN</td>
+                <td>合作评价</td>
+                <td>其他</td>
+                <td>操作</td>
+            </tr>
+           {% for moderator in moderator_list%}
+            <tr>
+                <td>{{ moderator.industry_type }}</td>
+                <td>{{ moderator.bbs_type }}</td>
+                <td>{{ moderator.media_name }}</td>
+                <td>{{ moderator.channel }}</td>
+                <td>{{ moderator.bbs_block }}</td>
+                <td>{{  moderator.bbs_link}}</td>
+                <td>{{ moderator.alexa_ranking }}</td>
+                <td>{{  moderator.block_advantage}}</td>
+                <td>{{  moderator.moderator_id }}</td>
+                <td>{{  moderator.name }}</td>
+                <td>{{  moderator.mobile_number }}</td>
+                <td>{{  moderator.email }}</td>
+                <td>{{  moderator.qq }}</td>
+                <td>{{  moderator.msn }}</td>
+                <td>{{  moderator.cooperate_evaluation }}</td>
+                <td>{{  moderator.other_info }}</td>
+                <td><a href="{% url edit_moderator moderator.id %}">编辑</a><a href="{% url delete_moderator moderator.id %}" onclick="return confirm('确定删除吗?')">删除</a></td>
+            <tr>
+           {% empty %}
+            <tr><td  colspan="17">没有任何数据</td></tr>
+           {% endfor %} 
+       </table>
+    </di>
+{% endblock %}
+{% block js %}
+    <script type="text/javascript" src="/media-{{ request.path|first_subpath }}/js/jquery.form.js"></script>
+    <script type="text/javascript">
+        String.prototype.endWith=function(str){
+            if(str==null||str==""||this.length==0||str.length>this.length)
+              return false;
+            if(this.substring(this.length-str.length)==str)
+              return true;
+            else
+              return false;
+            return true;
+            }
+        function submitForm(){
+            file_path = $('#moderator_file').val();
+            if(file_path == ''){
+                alert('上传文件不能为空');                
+            }else if(!file_path.endWith('xls')){
+                alert('请上传.xsl结尾的excel文件');                                                                
+            }else{
+                $('#moderator_form').ajaxSubmit(function(data){
+                    if(data != 'succesful'){
+                        alert(data);
+                    }else{
+                           alert('上传成功');
+                       location.reload();   
+                    }                                                
+                });  
+                  
+            }
+                   
+        }
+    </script>
+{% endblock %}

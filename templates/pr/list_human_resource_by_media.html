@@ -1,0 +1,193 @@
+{% extends "ad_resource_mgmt/mp_base.html" %}
+{% load filters_extra %}
+{% block rightpanel %}
+    <div id="right">
+        <h2>人力资源页面</h2>
+        <div>信息数量显示：人力资源共计{{human_resource_count}}个，其中记者资源{{reporter_count}}个，博主资源{{blogowner_count}}个，版主资源{{moderator_count}}个
+        </div>
+        <div>具体内容如下:
+            <table>
+                <tr><td colspan="37">记者资源表</td></tr>
+                <tr>
+                    <td>省份</td>
+                    <td>城市</td>
+                    <td>媒体名称</td>
+                    <td>媒体类型</td>
+                    <td>媒体性质</td>
+                    <td>频道</td>
+                    <td>媒体级别</td>
+                    <td>姓名</td>
+                    <td>性别</td>
+                    <td>职务</td>
+                    <td>行业类型</td>
+                    <td>是否是新记者</td>
+                    <td>可配合的工作</td>
+                    <td>其他配合</td>
+                    <td>座机</td>
+                    <td>传真</td>
+                    <td>手机</td>
+                    <td>邮箱</td>
+                    <td>单位地址</td>
+                    <td>家庭地址</td>
+                    <td>邮编</td>
+                    <td>MSN</td>
+                    <td>QQ</td>
+                    <td>发布频次及时间</td>
+                    <td>身份证号码</td>
+                    <td>出生日期</td>
+                    <td>毕业学校</td>
+                    <td>学历</td>
+                    <td>行文风格</td>
+                    <td>爱好及特长</td>
+                    <td>工作经历</td>
+                    <td>目前单位就职时间</td>
+                    <td>最佳沟通时间</td>
+                    <td>对公关公司的要求</td>
+                    <td>个人成就及荣誉</td>
+                    <td>其他</td>
+                    <td>操作</td>
+                </tr>
+               {% for reporter in reporter_list%}
+                <tr>
+                    <td>{{ reporter.province }}</td>
+                    <td>{{ reporter.city }}</td>
+                    <td>{{ reporter.media_name }}</td>
+                    <td>{{  reporter.media_type}}</td>
+                    <td>{{  reporter.media_property }}</td>
+                    <td>{{  reporter.channel }}</td>
+                    <td>{{  reporter.media_level }}</td>
+                    <td>{{  reporter.name }}</td>
+                    <td>{{  reporter.gender }}</td>
+                    <td>{{  reporter.position }}</td>
+                    <td>{{  reporter.industry_type }}</td>
+                    <td>{{  reporter.new_or_old }}</td>
+                    <td>{{  reporter.proper_work }}</td>
+                    <td>{{  reporter.other_proper }}</td>
+                    <td>{{  reporter.fixed_number }}</td>
+                    <td>{{  reporter.fax }}</td>
+                    <td>{{  reporter.mobile_number }}</td>
+                    <td>{{  reporter.email }}</td>
+                    <td>{{  reporter.company_address }}</td>
+                    <td>{{  reporter.home_address }}</td>
+                    <td>{{  reporter.zip_code }}</td>
+                    <td>{{  reporter.msn }}</td>
+                    <td>{{  reporter.qq }}</td>
+                    <td>{{  reporter.car_carry_circle }}</td>
+                    <td>{{  reporter.id_number }}</td>
+                    <td>{% if reporter.birthday%}
+                            {{  reporter.birthday }}
+                        {% endif %}</td>
+                    <td>{{ reporter.graduate_school }}</td>
+                    <td>{{ reporter.education }}</td>
+                    <td>{{  reporter.style}}</td>
+                    <td>{{  reporter.hobbies }}</td>
+                    <td>{{  reporter.work_experience }}</td>
+                    <td>{% if reporter.last_work_time %}
+                            {{  reporter.last_work_time }}
+                        {% endif %}</td>
+                    <td>{{  reporter.best_communicate_time }}</td>
+                    <td>{{  reporter.require_to_pr_company }}</td>
+                    <td>{{  reporter.honor }}</td>
+                    <td>{{  reporter.other_info }}</td>
+                    <td><a href="{% url edit_reporter reporter.id %}">编辑</a><a href="{% url delete_reporter reporter.id %}" onclick="return confirm('确定删除吗?')">删除</a></td>
+                <tr>
+               {% empty %}
+                <tr><td  colspan="37">没有任何数据</td></tr>
+               {% endfor %} 
+           </table>
+           <br>
+            <table>
+                <tr><td  colspan="18">博主资源表</td></tr>
+                <tr>
+                    <td>博客名称</td>
+                    <td>博主姓名</td>
+                    <td>博主属性</td>
+                    <td>内容行业类型</td>
+                    <td>博客流量</td>
+                    <td>博客链接</td>
+                    <td>媒体名称</td>
+                    <td>博主写作风格</td>
+                    <td>博主手机</td>
+                    <td>邮箱</td>
+                    <td>QQ</td>
+                    <td>MSN</td>
+                    <td>撰写时间</td>
+                    <td>博主简介</td>
+                    <td>合作评价</td>
+                    <td>优势</td>
+                    <td>其他</td>
+                    <td>操作</td>
+                </tr>
+               {% for blog_owner in blogowner_list%}
+                <tr>
+                    <td>{{ blog_owner.blog_name }}</td>
+                    <td>{{ blog_owner.name }}</td>
+                    <td>{{ blog_owner.attr }}</td>
+                    <td>{{ blog_owner.content_industry_type }}</td>
+                    <td>{{  blog_owner.blog_flow}}</td>
+                    <td>{{  blog_owner.blog_link }}</td>
+                    <td>{{  blog_owner.media_name }}</td>
+                    <td>{{  blog_owner.writing_style }}</td>
+                    <td>{{  blog_owner.mobile }}</td>
+                    <td>{{  blog_owner.email }}</td>
+                    <td>{{  blog_owner.qq }}</td>
+                    <td>{{  blog_owner.msn }}</td>
+                    <td>{{  blog_owner.writing_time }}</td>
+                    <td>{{  blog_owner.introduction }}</td>
+                    <td>{{  blog_owner.cooperate_evaluation }}</td>
+                    <td>{{  blog_owner.advantage }}</td>
+                    <td>{{  blog_owner.other_info }}</td>
+                    <td><a href="{% url edit_blog_owner blog_owner.id %}">编辑</a><a href="{% url delete_blog_owner blog_owner.id %}" onclick="return confirm('确定删除吗?')">删除</a></td>
+                <tr>
+               {% empty %}
+                <tr><td  colspan="18">没有任何数据</td></tr>
+               {% endfor %} 
+           </table>
+           <br>
+           <table>
+                <tr><td  colspan="17">版主资源表</td></tr>
+                <tr>
+                    <td>行业类型</td>
+                    <td>BBS类型</td>
+                    <td>媒体名称</td>
+                    <td>频道</td>
+                    <td>BBS版块</td>
+                    <td>BBS链接</td>
+                    <td>Alexa排名</td>
+                    <td>版块优势</td>
+                    <td>版主ID</td>
+                    <td>真实姓名</td>
+                    <td>手机</td>
+                    <td>邮箱</td>
+                    <td>QQ</td>
+                    <td>MSN</td>
+                    <td>合作评价</td>
+                    <td>其他</td>
+                    <td>操作</td>
+                </tr>
+               {% for moderator in moderator_list%}
+                <tr>
+                    <td>{{ moderator.industry_type }}</td>
+                    <td>{{ moderator.bbs_type }}</td>
+                    <td>{{ moderator.media_name }}</td>
+                    <td>{{ moderator.channel }}</td>
+                    <td>{{ moderator.bbs_block }}</td>
+                    <td>{{  moderator.bbs_link}}</td>
+                    <td>{{ moderator.alexa_ranking }}</td>
+                    <td>{{  moderator.block_advantage}}</td>
+                    <td>{{  moderator.moderator_id }}</td>
+                    <td>{{  moderator.name }}</td>
+                    <td>{{  moderator.mobile_number }}</td>
+                    <td>{{  moderator.email }}</td>
+                    <td>{{  moderator.qq }}</td>
+                    <td>{{  moderator.msn }}</td>
+                    <td>{{  moderator.cooperate_evaluation }}</td>
+                    <td>{{  moderator.other_info }}</td>
+                    <td><a href="{% url edit_moderator moderator.id %}">编辑</a><a href="{% url delete_moderator moderator.id %}" onclick="return confirm('确定删除吗?')">删除</a></td>
+                <tr>
+               {% empty %}
+                <tr><td  colspan="17">没有任何数据</td></tr>
+           {% endfor %} 
+       </table>
+        </div>
+{% endblock %}

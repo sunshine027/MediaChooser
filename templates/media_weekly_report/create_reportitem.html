@@ -1,0 +1,370 @@
+{% extends "media_weekly_report/weekly_report_base.html" %}
+
+{% block content %}
+<p>当前用户: {% if user.last_name %}{{ user.last_name }}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}</p>
+<div style="width:40%; float: left;">
+<form action="" method="POST" id="form_reportitem">
+    <p>{{ form.start_day.errors }}<label for="id_start_day">开始日期: </label>{{ form.start_day }}</P>
+    <p>{{ form.end_day.errors }}<label for="id_end_day">结束日期: </label>{{ form.end_day }}</p>
+    <p>{{ form.client.errors }}<label for="id_client">客户名称: </label>{{ form.client }} <a href="#" onmousedown="return false;" onclick="showOrHide($('#create_client'));return false;"><img alt="add" src="../../../media_ldf/images/icon_add.gif"/></a></p>
+    <p>{{ form.project.errors }}<label for="id_project">项目名称: </label>{{ form.project }} <a href="#" onmousedown="return false;" onclick="showOrHide($('#create_project'));return false;"><img alt="add" src="../../../media_ldf/images/icon_add.gif"/></a></p>
+    <p>{{ form.work_type.errors }}<label for="id_end_day">工作类型: </label>{{ form.work_type }}</p>
+    <p>{{ form.work_subtype.errors }}<label for="id_work_subtype">工作类别: </label>{{ form.work_subtype }}</p>
+    <p>{{ form.desc.errors }}<label for="id_desc">工作描述: </label>{{ form.desc }}</p>
+    <p>{{ form.duration.errors }}<label for="id_duration">工作时长: </label>{{ form.duration }}</p>
+    <p><input type="submit" value="生成新周报" /> <a style="display: none;" id="toggle_scenario" href="#" onclick="toggleScenario();return false;">切换至"生成新周报"</a></p>
+    <input type="hidden" value="" name="id" />
+</form>
+<span id='m_tip' style="width:15%;display:none;color:#eeeeee;background-color:#dd0000;"> 修改中……</span>
+</div>
+
+<div style="width: 50%; float: left;">
+<div id="create_client" style="display: none; border: 1px solid #ccc; margin: 5px; padding: 5px;">
+    <form action="" method="POST" id="form_client">
+        <p>创建新客户</p>
+        <p><label for="id_client_c_name">名称: <input id="id_client_c_name" name="c_name" type="text" /> <label for="id_client_e_name">英文名: <input id="id_client_e_name" name="e_name" type="text" /></p>
+        <p><label for="id_client_desc">描述: <textarea cols="50" id="id_client_desc" name="desc"></textarea></p>
+        <p><input type="submit" value="提交" /></p>
+    </form>
+</div>
+
+<div id="create_project" style="display: none; border: 1px solid #ccc; margin: 5px; padding: 5px;">
+    <form action="" method="POST" id="form_project">
+        <p>创建新项目</p>
+        <p><label for="id_project_client">客户: <span id="id_project_client_name"></span><input id="id_project_client_id" name="client_id" type="hidden" value="" />
+        <p><label for="id_project_name">项目名: <input size="60" id="id_project_name" name="project_name" type="text" /></p>
+        <p><span class="warning">小贴士：</span></p>
+        <p class="indent1">“比稿项目”格式——品牌+部门+时间+比稿项目名（如：安踏09年全年比稿）;</p>
+        <p class="indent1">“推广项目”格式——品牌+部门+时间+推广项目名（如：联想消费5月IDEAPADS10推广）;</p>
+        <p class="indent1">“规划工作”格式——品牌+部门+时间+规划工作名称（如：联想服务器08年全年竞品分析报告）。</p>
+        <p><label for="id_project_revenue">营业额: <input id="id_project_revenue" name="revenue" type="text" /></p>
+        <p><label for="id_project_profit">利润: <input id="id_project_profit" name="profit" type="text" /></p>
+        <p><input type="submit" value="提交" /></p>
+    </form>
+</div>
+</div> 
+
+<table cellpadding="0" cellspacing="0" border="0" class="display" id="items_table">
+    <thead>
+        <tr><th>开始日期</th>
+        <th>结束日期</th>
+        <th>工作类型</th>
+        <th>客户名称</th>
+        <th>相关项目名称</th>
+        <th>工作类别</th>
+        <th>工作描述</th>
+        <th>工作时长</th>
+        <th>营业额</th>
+        <th>利润</th>
+        <th>删除</th>
+        <th>修改</th></tr>
+    </thead>
+    <tbody>
+        {% for item in items %}
+            <tr >
+                <td>{{ item.start_day }}</td>
+                <td>{{ item.end_day }}</td>
+                <td>{{ item.work_type.name }}</td>
+                <td>{{ item.client.c_name }}</td>
+                <td>{{ item.project.name}}</td>
+                <td>{{ item.work_subtype.name }}</td>
+                <td>{{ item.desc }}</td>
+                <td>{{ item.duration }}</td>
+                <td>{% ifequal item.work_subtype.name "排期下单" %}{{ item.project.revenue|default_if_none:"" }}{% endifequal %}</td>
+                <td>{% ifequal item.work_subtype.name "排期下单" %}{{ item.project.profit|default_if_none:"" }}{% endifequal %}</td>
+                <td><a href="#" id="tr_{{ item.id }}" name="report_to_delete" onmousedown="return false;" onclick="confirmDelReport({{ item.id }});return false;">删除</a></td>
+                <td><a href="#" onmousedown="return false;" onclick="modifyReport('{{ item.id }}');return false;">修改</a></td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+var proj_slt = '';
+var work_subtype_slt = '';
+function toggleScenario(){
+    $("#form_reportitem input[type='submit']").val("生成新周报");
+    $("#form_reportitem input[name='id']").val("");
+    $("#toggle_scenario").hide("slow");
+    return false;
+}
+
+function reportitem_submit() {
+    $("#form_reportitem").submit();
+}
+// create client
+function createClient() {
+    var client_c_name = $("#id_client_c_name").val();
+    var client_e_name = $("#id_client_e_name").val();
+    var client_desc = $("#id_client_desc").val();
+    if (client_c_name == '' || client_e_name == '') { $("#create_client").append("<p class='warning'>请输入客户名称</p>"); } else {
+        var tmp = location.pathname.split('/');
+        tmp[tmp.length-2] = 'create-client'; 
+        tmp[tmp.length-3] = 'client'       
+        $.post(tmp.join('/'), {c_name:client_c_name, e_name:client_e_name, desc:client_desc}, function(data){ 
+            j_data=eval(data);
+            if(j_data[0] == 0) { 
+                $("#create_client form").nextAll().empty();
+                $("#create_client").append("<p class='warning'>"+j_data[1]+"</p>"); 
+            } else {
+                $("#create_client").toggle("slow");
+                $("#id_client_c_name").val("");$("#id_client_e_name").val("");$("#id_client_desc").val("");
+                $("#create_client form").nextAll().empty();
+                $("#id_client").append("<option value='"+j_data[1][0]+"'>"+j_data[1][1]+"</option>");
+                $("#id_client").val(j_data[1][0]).change();
+                $("#id_project_client_name").text(j_data[1][1]);
+                $("#id_project_client_id").val(j_data[1][0]);
+            }
+        });
+    } 
+}
+function createProject() {
+    var proj_client_id = $("#id_project_client_id").val();
+    var proj_name = $("#id_project_name").val();
+    var proj_revenue = $("#id_project_revenue").val();
+    var proj_profit = $("#id_project_profit").val();
+    if (proj_client_id == '' || proj_name == '') { $("#create_project").append("<p class='warning'>请确保客户名称及项目名称正确</p>"); } else {
+        var tmp = location.pathname.split('/');
+        tmp[tmp.length-2] = 'create-project';       
+        $.post(tmp.join('/'), {client_id:proj_client_id, name:proj_name, revenue:proj_revenue, profit:proj_profit}, function(data){ 
+            j_data=eval(data);
+            if(j_data[0] == 0) { 
+                $("#create_project form").nextAll().empty();
+                $("#create_project").append("<p class='warning'>"+j_data[1]+"</p>"); 
+            } else {
+                $("#create_project").toggle("slow");
+                $("#id_project_name").val("");$("#id_project_revenue").val("");$("#id_project_profit").val("");
+                $("#create_project form").nextAll().empty();
+                $("#id_project").append("<option value='"+j_data[1][0]+"'>"+j_data[1][1]+"</option>");
+                $("#id_project").val(j_data[1][0]);                
+            }
+        });        
+    }
+}
+
+function confirmDelReport(id) {
+    if (confirm("删除该周报记录？")) {
+        var pth = location.pathname.split('/');
+        pth[pth.length-2] = 'delete-report';
+        var row = $("#tr_"+id).parent().parent().prevAll().length;
+        $.post(pth.join('/'), {report_id:id}, function (data) {
+            report_item_table.fnDeleteRow(row);
+        });
+    } else { return false; }
+}
+
+function post_slt(work_subtype, project){
+    $("#id_project").val(project);
+    $("#id_work_subtype").val(work_subtype);
+}
+
+function modifyReport(id){
+    var pth = location.pathname.split('/');
+    pth[pth.length-2] = 'get-report';
+    
+    $.post(pth.join('/'), {report_id:id}, function (data){    
+        j_data = eval(data)[0];
+        // setup proj_slt & work_subtype_slt for next usage
+        proj_slt = j_data.project;
+        work_subtype_slt = j_data.work_subtype;
+        // setup the values of form's child element
+        $("#id_start_day").val(j_data.start_day);
+        $("#id_end_day").val(j_data.end_day);
+        $("#id_work_type").val(j_data.work_type).change();
+        //$("#id_client").val(j_data.client).trigger('change', [j_data.project, ]);
+        $("#id_client").val(j_data.client).change();
+        $("#id_desc").val(j_data.desc);
+        $("#id_duration").val(j_data.duration);
+        $("#form_reportitem input[name='id']").val(j_data.id);
+        $("#form_reportitem input[type='submit']").val("修改周报");
+        $("#toggle_scenario").show("slow");
+        //setTimeout("$('#id_project').val("+j_data.project+");$('#id_work_subtype').val("+j_data.work_subtype+");", 600);
+        setTimeout(function() {
+            $('#id_project').val(j_data.project);
+            $('#id_work_subtype').val(j_data.work_subtype);
+        }, 600);
+        // 使得输入框的焦点重定向到client
+        $("#form_reportitem input").blur();
+        $("#form_reportitem select").blur();  
+        $("#form_reportitem textarea").blur();
+        $("#id_client").focus();      
+    });
+}
+
+function showOrHide(self) {
+    $(self).toggle("slow");
+}
+jQuery.fn.dataTableExt.oSort['null-asc']  = function(x,y) {  
+    return ((x < y) ? -1 : ((x > y) ?  1 : 0));  
+};  
+jQuery.fn.dataTableExt.oSort['null-desc'] = function(x,y) {  
+    return ((x < y) ?  1 : ((x > y) ? -1 : 0));  
+}; 
+
+function clientChange(slt_proj) {
+    var slt = $("#id_client").val()
+    if(slt != '') {
+        var tmp = location.pathname.split('/');
+        tmp[tmp.length-2] = 'get-projects';
+        $.post(tmp.join('/'), {client_id:slt}, function(data) {
+            $("#id_project").empty().append("<option value='' selected='selected'>---------</option>");
+            j_data = eval(data);
+            $.each(j_data, function(k, item){
+                $("#id_project").append("<option value='"+item.id+"'>"+item.name+"</option>");
+            });
+        });
+    } 
+    if(slt_proj!=null && slt_proj!=undefined) {
+        $("id_project").val(slt_proj);
+    }
+    return false;
+}
+
+var report_item_table;
+$(document).ready(function() {
+    report_item_table = $("#items_table").dataTable({
+            		"bPaginate": false,
+                    "bSort": true,
+            		"bInfo": true,
+            		"bLengthChange": false,
+                    "bAutoWidth": false,
+            		"aoColumns": [{"sType":"string", "sWidth": "3%"}, 
+                                {"sType":"string", "sWidth": "3%"}, 
+                                {"sWidth": "3%"}, 
+                                {"sWidth": "3%"}, 
+                                {"sWidth": "10%"}, 
+                                {"sWidth": "4%"}, 
+                                {"sWidth": "10%"}, 
+                                {"sWidth": "2%"}, 
+                                {"sWidth": "3%"}, 
+                                {"sWidth": "3%"}, 
+                                {"bSearchable": false, "bSortable": false, "sWidth": "2%"}, 
+                                {"bSearchable": false, "bSortable": false, "sWidth": "2%"}],
+            		"oLanguage": {
+            			"sInfo": "共 _TOTAL_ 条周报",
+            			"sInfoFiltered": "(从 _MAX_ 条周报中过滤获得)",
+            			"sSearch": "搜索",
+                        "sInfoEmpty": "共 0 条周报",
+                        "sZeroRecords": "无匹配项" 
+            		},
+            		"sDom": '<"top"ilf>tr',
+                    "aaSorting": [[0, 'desc'], [4, 'asc'], [4, 'asc'], [2, 'asc'], [5, 'asc']]
+            	});    
+    
+    $("#id_work_type").change(function() {
+        var slt = $("#id_work_type").val()
+        if(slt != '') {
+            var tmp = location.pathname.split('/');
+            tmp[tmp.length-2] = 'get-subtypes';
+            $.post(tmp.join('/'), {parent_id:slt}, function(data) {
+                $("#id_work_subtype").empty().append("<option value='' selected='selected'>---------</option>");
+                j_data = eval(data);
+                $.each(j_data, function(k, item){
+                    $("#id_work_subtype").append("<option value='"+item.id+"'>"+item.name+"</option>");
+                });
+                $("#id_work_subtype").val(work_subtype_slt);
+                work_subtype_slt = '';
+            });
+        } 
+        return false;
+    });
+
+    $("#id_client").change(function() {
+        var slt = $("#id_client").val()
+        if(slt != '') {
+            var tmp = location.pathname.split('/');
+            tmp[tmp.length-2] = 'get-projects';
+            $.post(tmp.join('/'), {client_id:slt}, function(data) {
+                $("#id_project").empty().append("<option value='' selected='selected'>---------</option>");
+                j_data = eval(data);
+                $.each(j_data, function(k, item){
+                    $("#id_project").append("<option value='"+item.id+"'>"+item.name+"</option>");
+                });
+                $("#id_project").val(proj_slt);
+                proj_slt = '';
+            });
+        } 
+        return false;
+    });
+    
+    $("#id_project_client_name").text($("#id_client :selected").text());
+    $("#id_project_client_id").val($("#id_client :selected").val());
+    $("#id_client").change(function() {
+        $("#id_project_client_name").text($("#id_client :selected").text());
+        $("#id_project_client_id").val($("#id_client :selected").val());
+    });
+    
+    // use validat lib to check the input validation, then submit using ajax
+    $("#form_reportitem").validate({
+        rules: {
+            start_day: "required",
+            end_day: "required",
+            work_type: "required",
+            work_subtype: "required",
+            duration: {required: true, number: true}
+        },
+        messages: {},
+        submitHandler: function(form){
+            var querystring = $(form).serialize(); 
+            var pth = location.pathname.split('/');
+            pth[pth.length-2] = 'reportitem';
+            
+            $.post(pth.join('/'), querystring, function(data){
+                j_data = eval(data);
+                if (j_data[0] == 0) {
+                // create item success
+                    report_item_table.fnAddData([j_data[1].start_day, j_data[1].end_day, j_data[1].work_type, j_data[1].client, j_data[1].project, j_data[1].work_subtype, j_data[1].desc, j_data[1].duration, j_data[1].revenue, j_data[1].profit, "<a href='#' onmousedown='return false;' id='tr_"+j_data[1].id+"' name='report_to_delete' onclick='confirmDelReport("+j_data[1].id+");return false;'>删除</a>", "<a href='#' onmousedown='return false;' onclick='modifyReport("+j_data[1].id+");return false;'>修改</a>"]);
+                    $("#item_table tbody tr[class*='newadd']").removeClass("newadd");
+                    $("#tr_"+j_data[1].id).parent().parent().addClass("newadd");
+                    alert("新周报已生成！");
+                } else if (j_data[0] == 1) {
+                // modify item success, first delete row, then add a new row
+                    report_item_table.fnDeleteRow($("#tr_"+j_data[1].id).parent().parent().prevAll().length);
+                    report_item_table.fnAddData([j_data[1].start_day, j_data[1].end_day, j_data[1].work_type, j_data[1].client, j_data[1].project, j_data[1].work_subtype, j_data[1].desc, j_data[1].duration, j_data[1].revenue, j_data[1].profit, "<a href='#' onmousedown='return false;' id='tr_"+j_data[1].id+"' name='report_to_delete' onclick='confirmDelReport("+j_data[1].id+");return false;'>删除</a>", "<a href='#' onmousedown='return false;' onclick='modifyReport("+j_data[1].id+");return false;'>修改</a>"]);
+                    $("#item_table tbody tr[class*='newadd']").removeClass("newadd");
+                    $("#tr_"+j_data[1].id).parent().parent().addClass("newadd");                    
+                    toggleScenario();
+                    alert("周报已修改！");
+                }
+            });
+            return false;
+        }
+    });
+    
+    // validate client creation
+    $("#form_client").validate({
+        rules: {
+            "c_name": "required",
+            "e_name": "required"
+        },
+        messages: {},
+        submitHandler: function(form){
+            createClient();
+            return false;
+        }
+    });
+    
+    // validate project creation
+    $("#form_project").validate({
+        rules: {
+            client_id: "required",
+            project_name: "required",
+            revenue: {required: false, number: true},
+            profit: {required: false, number: true}
+        },
+        messages: {},
+        submitHandler: function(form){
+            createProject();
+            return false;
+        }
+    });
+    
+});
+
+$
+</script>
+{% endblock %}

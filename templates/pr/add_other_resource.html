@@ -1,0 +1,61 @@
+{% extends "ad_resource_mgmt/mp_base.html" %}
+{% block rightpanel %}
+    <div id="right"><h2>增加其他页面</h2>
+        {{ other_resource_form.errors }}
+        <form action="{% url add_other_resource %}" method="post">
+            <table>
+                <tr>
+                    <td>属性: </td>
+                    <td>{{ other_resource_form.attr }}</td>
+                </tr>
+                <tr>
+                    <td>适合行业类型: </td>
+                    <td>{{ other_resource_form.industry_type }}</td>
+                </tr>
+                <tr>
+                    <td>姓名: </td>
+                    <td>{{ other_resource_form.name }}</td>
+                </tr>
+                <tr>
+                    <td>作品风格: </td>
+                    <td>{{ other_resource_form.works_style }}</td>
+                </tr>
+                <tr>
+                    <td>所在城市: </td>
+                    <td>{{ other_resource_form.city }}</td>
+                </tr>
+                <tr>
+                    <td>手机: </td>
+                    <td>{{ other_resource_form.mobile_number }}</td>
+                </tr>
+                <tr>
+                    <td>邮箱: </td>
+                    <td>{{ other_resource_form.email }}</td>
+                </tr>
+                <tr>
+                    <td>QQ: </td>
+                    <td>{{ other_resource_form.qq }}</td>
+                </tr>
+                <tr>
+                    <td>MSN: </td>
+                    <td>{{ other_resource_form.msn }}</td>
+                </tr>
+                <tr>
+                    <td>制作时间: </td>
+                    <td>{{ other_resource_form.making_time }}</td>
+                </tr>
+                <tr>
+                    <td>合作评价: </td>
+                    <td>{{ other_resource_form.cooperate_evaluation }}</td>
+                </tr>
+                <tr>
+                    <td>其他: </td>
+                    <td>{{ other_resource_form.other_info }}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><input type="submit" value="增加"/></td>
+                </tr>
+            </table>
+        </form>
+    </div>
+{% endblock %}

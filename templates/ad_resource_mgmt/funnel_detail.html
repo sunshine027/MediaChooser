@@ -1,0 +1,82 @@
+{% extends "ad_resource_mgmt/mp_detail_base.html" %}
+{% load filters_extra %}
+{% block uppanel %}
+    <div>
+        <div>Convertion Ratio</div>
+        <a title="导出excel文件" href="{% url get_campaign_funel_xls campaign_id %}"><img src="/media-{{ request.path|first_subpath }}/images/icon_excel.gif" border=0 /></a>
+        <!--<input type="button" value="dian" onclick="ExportMyChart()"/>-->
+        <div id="funnel_chart">
+            You need to install or upgrade your flash player
+        </div>
+    </div>        
+{% endblock %}
+{% block downpanel %}
+    {% if ubs %}
+        <div id="ub-table" style="clear:both;">
+            <h3>用户行为数据</h3>
+            <table style="width:80%;">
+            <tr>
+                <td colspan='3' style="text-align:center">媒体</td>
+                <td colspan='3' style="text-align:center">点击数据</td>
+                <td colspan='8' style="text-align:center">用户行为数据</td>
+            </tr>
+            <tr>
+                <td width="10%">媒体</td>
+                <td width="16%">频道</td>
+                <td width="10%">广告位</td>
+                <td>前点击</td>
+                <td>visits</td>
+                <td>流失率</td>
+                <td>PageViews</td>
+                {% ifequal tracking 'ga' %}<td width="15%">平均停留时长(秒)</td>{% endifequal %}
+                {% ifequal tracking 'ga' %}<td>跳出率</td>{% endifequal %}
+                {% ifequal tracking 'om' %}<td width="7%">ub</td>{% endifequal %}
+                {% ifequal tracking 'om' %}<td width="7%">产品详情页</td>{% endifequal %}
+                {% ifequal tracking 'om' %}<td width="7%">购物车</td>{% endifequal %}
+                {% ifequal tracking 'om' %}<td width="7%">checkout</td>{% endifequal %}
+                {% ifequal tracking 'om' %}<td width="7%">order</td>{% endifequal %}
+                {% ifequal tracking 'om' %}<td width="7%">revenue</td>{% endifequal %}
+                <td>tracking code</td>
+            </tr>        
+            {% for ub in ubs %}
+                <tr>
+                    <td>{{ ub.media }}</td>
+                    <td>{{ ub.channel }}</td>
+                    <td>{{ ub.adform }}</td>
+                    <td>{{ ub.click }}</td>
+                    <td>{{ ub.visits }}</td>
+                    <td>{{ ub.loss }}%</td>
+                    <td>{{ ub.pv }}</td>
+                    {% ifequal tracking 'ga' %}<td>{{ ub.avg_time }}</td>{% endifequal %}
+                    {% ifequal tracking 'ga' %}<td>{{ ub.bounce_rate }}%</td>{% endifequal %}
+                    {% ifequal tracking 'om' %}<td>{{ ub.uv }}</td>{% endifequal %}
+                    {% ifequal tracking 'om' %}<td>{{ ub.products_view }}</td>{% endifequal %}
+                    {% ifequal tracking 'om' %}<td>{{ ub.cart_addition }}</td>{% endifequal %}
+                    {% ifequal tracking 'om' %}<td>{{ ub.checkouts }}</td>{% endifequal %}
+                    {% ifequal tracking 'om' %}<td>{{ ub.orders }}</td>{% endifequal %}
+                    {% ifequal tracking 'om' %}<td>{{ ub.revenue }}</td>{% endifequal %}
+                    <td>{{ ub.tracking_code }}</td>
+                </tr>            
+            {% endfor %}
+    </table>
+</div>
+{% endif %}     
+{% endblock %}
+{% block js %}
+    <script language="JavaScript" src="/media-{{ request.path|first_subpath }}/fusioncharts/js/FusionCharts.js"></script>
+    <script type="text/javascript">
+        var funnel_chart = new FusionCharts("/media-{{ request.path|first_subpath }}/fusioncharts/charts/Funnel.swf", "chart_funnel", "425", "350", "0", "0");
+        funnel_chart.setXMLUrl("{% url get_chart_api campaign_id 'funnel_chart' %}");
+        funnel_chart.render("funnel_chart");  
+        
+       function ExportMyChart() {
+    
+            var chartObject = getChartFromId('chart_funnel');
+    
+            if( chartObject.hasRendered() ) {
+                chartObject.exportChart();
+            }
+    
+       }
+    </script>      
+{% endblock %}

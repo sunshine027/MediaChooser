@@ -1,0 +1,34 @@
+{% extends "ad_resource_mgmt/mp_base.html" %}
+
+{% block sectionid %}mp_status{% endblock %}
+
+{% block rightpanel %}
+
+<div>
+  <h2>实时广告位点击信息</h2>
+    <table>
+        <tr>
+            <td>排期号</td><td>媒体</td><td width="400px">频道</td><td width="100px">广告位</td><td width="70px">金额</td>
+            
+			<td width="100px">7天前数据</td><td width="100px">6天前数据</td>
+			<td width="100px">5天前数据</td><td width="100px">4天前数据</td>
+			<td width="100px">3天前数据</td><td width="100px">前天数据</td>
+			<td width="100px">昨天数据</td><td width="100px">今日数据</td>
+        </tr>
+    {% for r in data %}
+    <tr><td><a href="{% url get_campaign r.campaign %}" target="_blank">{{ r.campaign }}</a></td>
+	<td>{{ r.media }}</td><td>{{ r.channel }}</td><td>{{ r.media_ad_info.adform}}</td>
+	<td>{{ r.price|floatformat }}</td>
+	<td {% if r.day7.if_planned %}style="color:blue;font-weight:bold;"{% endif %}>{{ r.day7.click }}</td>
+	<td {% if r.day6.if_planned %}style="color:blue;font-weight:bold;"{% endif %}>{{ r.day6.click }}</td>
+	<td	{% if r.day5.if_planned %}style="color:blue;font-weight:bold;"{% endif %}>{{ r.day5.click }}</td>
+	<td {% if r.day4.if_planned %}style="color:blue;font-weight:bold;"{% endif %}>{{ r.day4.click }}</td>
+	<td {% if r.day3.if_planned %}style="color:blue;font-weight:bold;"{% endif %}>{{ r.day3.click }}</td>
+	<td {% if r.day2.if_planned %}style="color:blue;font-weight:bold;"{% endif %}>{{ r.day2.click }}</td>
+	<td {% if r.day1.if_planned %}style="color:blue;font-weight:bold;"{% endif %}>{{ r.day1.click }}</td>
+	<td style="color:red;">{{ r.today }}</td></tr>
+    {% endfor %}
+    </table>
+</div>
+
+{% endblock %}

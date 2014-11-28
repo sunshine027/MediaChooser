@@ -1,0 +1,92 @@
+{% extends "ad_resource_mgmt/mp_base.html" %}
+{% load filters_extra %}
+{% block rightpanel %}
+    <div id="right">
+        <form method="post" action="{% url list_search_human_resource %}" id="searchform"/>
+            <input type="hidden" name="searchmodel" id="searchmodel" value=""/>
+            <input type="hidden" name="searchtype" id="searchtype" value=""/>
+            <input type="hidden" name="searchval" id="searchval" value=""/>
+        </form>
+        <h2>人力资源页面</h2>
+        <div>信息数量显示：人力资源共计{{human_resource_count}}个
+        </div>
+        <div>详细内容如下:
+            <br>
+            <div>
+                <div>记者资源:<a href="{% url list_reporter %}">共计{{reporter_count}}个</a> , <a href="{% url list_update_reporter %}">近两周更新{{update_reporter_count}}个</a></div>
+                <div>按媒体性质划分:
+                    {% for media_property, count in reporter_by_media_property_list.items %}
+                        <span><a href="" onclick="setValue('reporter','media_property', '{{media_property}}');return false;">{{media_property}}({{ count}}个)</a></span>
+                    {% empty %}
+                    <span>暂无数据</span>
+                    {% endfor %}
+                </div>
+                <div>按媒体级别划分:
+                    {% for media_level, count in reporter_by_media_level_list.items %}
+                        <span><a href="" onclick="setValue('reporter','media_level', '{{media_level}}');return false;">{{media_level}}({{ count}}个)</a></span>
+                    {% empty %}
+                    <span>暂无数据</span>
+                    {% endfor %}
+                </div>
+                <div>按行业类型划分:
+                    {% for industry_type, count in reporter_by_industry_type_list.items %}
+                        <span><a href="" onclick="setValue('reporter','industry_type', '{{industry_type}}');return false;">{{industry_type}}({{ count}}个)</a></span>
+                    {% empty %}
+                    <span>暂无数据</span>
+                    {% endfor %}
+                </div>
+            </div>
+            <br>
+            <div>
+                <div>博主资源:<a href="{% url list_blog_owner %}">共计{{blogowner_count}}个</a> , <a href="{% url list_update_blog_owner%}">近两周更新{{update_blogowner_count}}个</a></div>
+                <div>按博主属性划分:
+                    {% for attr, count in blogowner_by_attr_list.items %}
+                        <span><a href="" onclick="setValue('blogowner','attr', '{{attr}}');return false;">{{attr}}({{ count}}个)</a></span>
+                    {% empty %}
+                    <span>暂无数据</span>
+                    {% endfor %}
+                </div>
+                <div>按媒体名称划分:
+                    {% for media_name, count in blogowner_by_media_name_list.items %}
+                        <span><a href="" onclick="setValue('blogowner','media_name', '{{media_name}}');return false;">{{media_name}}({{ count}}个)</a></span>
+                    {% empty %}
+                    <span>暂无数据</span>
+                    {% endfor %}
+                </div>
+            </div>
+            <br>
+            <div>
+                <div>版主资源:<a href="{% url list_moderator %}">共计{{moderator_count}}个</a> , <a href="{% url list_update_moderator%}">近两周更新{{update_moderator_count}}个</a></div>
+                <div>按行业类型划分:
+                    {% for industry_type, count in moderator_by_industry_type_list.items %}
+                        <span><a href="" onclick="setValue('moderator','industry_type', '{{industry_type}}');return false;">{{industry_type}}({{ count}}个)</a></span>
+                    {% empty %}
+                    <span>暂无数据</span>
+                    {% endfor %}
+                </div>
+                <div>按BBS类型划分:
+                    {% for bbs_type, count in moderator_by_bbs_type_list.items %}
+                        <span><a href="" onclick="setValue('moderator','bbs_type', '{{bbs_type}}');return false;">{{bbs_type}}({{ count}}个)</a></span>
+                    {% empty %}
+                    <span>暂无数据</span>
+                    {% endfor %}
+                </div>
+            </div>
+            <br>
+            <div>
+                <div>其他资源:<a href="{% url list_other_resource %}">共计{{other_resource_count}}个</a> , <a href="{% url list_update_other_resource%}">近两周更新{{update_other_resource_count}}个</a></div>
+                
+            </div>
+        </div>
+        
+{% endblock %}
+{% block js %}
+    <script type="text/javascript">
+        function setValue(model, type, val){
+               $('#searchmodel').val(model);                      
+               $('#searchtype').val(type);
+               $('#searchval').val(val);
+               $('#searchform').submit();
+        }
+    </script>
+{% endblock %}

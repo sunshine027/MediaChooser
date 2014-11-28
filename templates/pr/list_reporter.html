@@ -1,0 +1,133 @@
+{% extends "ad_resource_mgmt/mp_base.html" %}
+{% load filters_extra %}
+{% block rightpanel %}
+    <div id="right"><h2>记者列表页面</h2>
+        <a href="{% url add_reporter %}">增加</a><br>
+        <form action="{% url batch_add_reporter_by_excel %}" method="post" id="reporter_form" enctype="multipart/form-data">
+            上传记者: <input type="file" id="reporter_file" name="reporter_file">
+            <input type="button" onclick="submitForm()" value="确定"/>
+            {{ ret.msg }}
+        </form>
+        <table>
+            <tr>
+                <td>省份</td>
+                <td>城市</td>
+                <td>媒体名称</td>
+                <td>媒体类型</td>
+                <td>媒体性质</td>
+                <td>频道</td>
+                <td>媒体级别</td>
+                <td>姓名</td>
+                <td>性别</td>
+                <td>职务</td>
+                <td>行业类型</td>
+                <td>是否是新记者</td>
+                <td>可配合的工作</td>
+                <td>其他配合</td>
+                <td>座机</td>
+                <td>传真</td>
+                <td>手机</td>
+                <td>邮箱</td>
+                <td>单位地址</td>
+                <td>家庭地址</td>
+                <td>邮编</td>
+                <td>MSN</td>
+                <td>QQ</td>
+                <td>发布频次及时间</td>
+                <td>身份证号码</td>
+                <td>出生日期</td>
+                <td>毕业学校</td>
+                <td>学历</td>
+                <td>行文风格</td>
+                <td>爱好及特长</td>
+                <td>工作经历</td>
+                <td>目前单位就职时间</td>
+                <td>最佳沟通时间</td>
+                <td>对公关公司的要求</td>
+                <td>个人成就及荣誉</td>
+                <td>其他</td>
+                <td>操作</td>
+            </tr>
+           {% for reporter in reporter_list%}
+            <tr>
+                <td>{{ reporter.province }}</td>
+                <td>{{ reporter.city }}</td>
+                <td>{{ reporter.media_name }}</td>
+                <td>{{  reporter.media_type}}</td>
+                <td>{{  reporter.media_property }}</td>
+                <td>{{  reporter.channel }}</td>
+                <td>{{  reporter.media_level }}</td>
+                <td>{{  reporter.name }}</td>
+                <td>{{  reporter.gender }}</td>
+                <td>{{  reporter.position }}</td>
+                <td>{{  reporter.industry_type }}</td>
+                <td>{{  reporter.new_or_old }}</td>
+                <td>{{  reporter.proper_work }}</td>
+                <td>{{  reporter.other_proper }}</td>
+                <td>{{  reporter.fixed_number }}</td>
+                <td>{{  reporter.fax }}</td>
+                <td>{{  reporter.mobile_number }}</td>
+                <td>{{  reporter.email }}</td>
+                <td>{{  reporter.company_address }}</td>
+                <td>{{  reporter.home_address }}</td>
+                <td>{{  reporter.zip_code }}</td>
+                <td>{{  reporter.msn }}</td>
+                <td>{{  reporter.qq }}</td>
+                <td>{{  reporter.car_carry_circle }}</td>
+                <td>{{  reporter.id_number }}</td>
+                <td>{% if reporter.birthday%}
+                        {{  reporter.birthday }}
+                    {% endif %}</td>
+                <td>{{ reporter.graduate_school }}</td>
+                <td>{{ reporter.education }}</td>
+                <td>{{  reporter.style}}</td>
+                <td>{{  reporter.hobbies }}</td>
+                <td>{{  reporter.work_experience }}</td>
+                <td>{% if reporter.last_work_time %}
+                        {{  reporter.last_work_time }}
+                    {% endif %}</td>
+                <td>{{  reporter.best_communicate_time }}</td>
+                <td>{{  reporter.require_to_pr_company }}</td>
+                <td>{{  reporter.honor }}</td>
+                <td>{{  reporter.other_info }}</td>
+                <td><a href="{% url edit_reporter reporter.id %}">编辑</a><a href="{% url delete_reporter reporter.id %}" onclick="return confirm('确定删除吗?')">删除</a></td>
+            <tr>
+           {% empty %}
+            <tr><td  colspan="37">没有任何数据</td></tr>
+           {% endfor %} 
+           </table>
+    </div>
+{% endblock %}
+{% block js %}
+    <script type="text/javascript" src="/media-{{ request.path|first_subpath }}/js/jquery.form.js"></script>
+    <script type="text/javascript">
+        String.prototype.endWith=function(str){
+            if(str==null||str==""||this.length==0||str.length>this.length)
+              return false;
+            if(this.substring(this.length-str.length)==str)
+              return true;
+            else
+              return false;
+            return true;
+            }
+        function submitForm(){
+            file_path = $('#reporter_file').val();
+            if(file_path == ''){
+                alert('上传文件不能为空');                
+            }else if(!file_path.endWith('xls')){
+                alert('请上传.xsl结尾的excel文件');                                                                
+            }else{
+                $('#reporter_form').ajaxSubmit(function(data){
+                    if(data != 'succesful'){
+                        alert(data);
+                    }else{
+                        alert('上传成功');
+                       location.reload();   
+                    }                                                
+                });  
+                  
+            }
+                   
+        }
+    </script>
+{% endblock %}

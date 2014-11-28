@@ -1,0 +1,34 @@
+#! /usr/bin/env python
+#coding=utf-8
+
+from django.conf.urls.defaults import *
+
+urlpatterns = patterns('MediaChooser.ad_resource_mgmt.views',
+    url(r'^$', 'query', name="query"),
+    (r'^search/$', 'search'),
+    
+    (r'^query_mflights/$', 'query_mflights'),
+    (r'^mflights/$', 'mflights'),
+    (r'^query_media/$', 'query_media'),
+    url(r'^campaign/(?P<campaign_id>\d+)/$', 'get_campaign', name='get_campaign'),
+#    url(r'^campaign/(?P<campaign_id>\d+)/export/$', 'campaign_export', name='campaign_export'),
+    url(r'^campaign_detail/(?P<campaign_id>\d+)/$', 'get_campaign_detail', name='get_campaign_detail'),
+    url(r'^media_filter/$', 'media_filter', name="media_filter"),
+    url(r'^media_reco/$', 'media_reco', name="media_reco"),
+    
+    (r'^get_mediatree/$', 'get_mediatree'),
+    (r'^get_mediatree_chart/$', 'get_mediatree_chart'),
+    (r'^get_mediareco/$', 'get_mediareco'),
+    (r'^get_mediacats/$', 'get_mediacats'),
+    url(r'^upload_creative/$', 'upload_creative', name="upload_creative"),
+    url(r'^upload_creative/del/$', 'delete_upload_creative', name="delete_upload_creative"),
+    url(r'^update_background_code/$', 'update_background_code', name="update_background_code"),
+    (r'^media_reco/', 'media_reco'),
+    (r'^change_flightname/', 'change_flightname'),
+    url(r'^get_campaign_xls/(?P<campaign_id>\d+)/', 'get_campaign_xls', name='get_campaign_xls'),
+    
+    url(r'^chart_api/(?P<campaign_id>\d+)/(?P<chart_id>\w+)/', 'chart_api', name='get_chart_api'),
+    
+    #(r'^get_test_amdata/', 'get_test_amdata'),
+    #(r'^get_test_amcolumn/', 'get_test_amcolumn'),
+)

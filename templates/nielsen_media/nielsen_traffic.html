@@ -1,0 +1,86 @@
+{% extends "nielsen_media/nielsen_media_base.html" %}
+
+{% block content %}
+
+	<p>流量趋势分析:</p>
+
+	<form action="" method="POST" id="form_nielsen">
+
+		<p>{{ form.category.errors }}<label for="id_category">网站: </label>{{ form.category }}
+			<select id="mediadropdown" disabled="disabled" name="mediadropdown"><option value="---">---</option></select>
+		</p>
+
+		<p>{{ form.week_start.errors }}<label for="id_week_start">从: </label>{{ form.week_start }}&nbsp;&nbsp;{{ form.week_end.errors }}<label for="id_week_end">到: </label>{{ form.week_end }}</p>
+
+		<p>
+			<input id="button_chart" type="button" value="生成图表">
+		</p>
+	</form>
+	
+	<div id="jshere"> </div>
+
+	<div id="my_chart"></div>
+	
+{% endblock %}
+
+
+{% block js %}
+<script type="text/javascript" src="/files_dl/swfobject.js"></script>
+
+<SCRIPT LANGUAGE="JavaScript">
+
+$(document).ready(function(){
+	
+	$("select[id^='id_category']").change(function(){
+		adjustMediaDropdown();
+	});
+
+	$.fn.emptySelect = function() {
+		return this.each(function(){
+		if (this.tagName=='SELECT') this.options.length = 0;
+		});
+	}
+
+	$.fn.loadSelect = function(optionsDataArray) {
+		return this.emptySelect().each(function(){
+		if (this.tagName=='SELECT') {
+		var selectElement = this;
+		$.each(optionsDataArray,function(index,optionData){
+			var option = new Option(optionData.caption, optionData.value);
+			if ($.browser.msie) {
+				selectElement.add(option);
+			}else {
+				selectElement.add(option,null);
+			}
+			});
+			}
+		});
+		}
+
+	$('#button_chart').click(function(){
+		$("#jshere").empty();
+		path = location.pathname.split('/');
+		path[path.length-2] = 'chart';
+		$("#jshere").append("<script type='text/javascript'>swfobject.embedSWF('/files_dl/open-flash-chart.swf', 'my_chart', '500', '300', '9.0.0','expressInstall.swf', {'data-file': path.join('/')}, false, false);<\/script>");
+	});
+
+	});
+
+	function adjustMediaDropdown(){
+		var category = $("select[id^='id_category']").val();
+		var media_dropdown;
+		media_dropdown = $('#mediadropdown');
+		if (category.length == 0){
+			media_dropdown.attr("disabled", true);
+			$(media_dropdown).emptySelect();
+		}else{
+			media_dropdown.attr("disabled", false);
+			path = location.pathname.split('/');
+			path[path.length-2] = 'get_media_options'
+			$.getJSON(path.join('/'), {category:category}, function(data){
+				media_dropdown.loadSelect(data);
+			});
+		}}
+	
+</SCRIPT>
+{% endblock %}

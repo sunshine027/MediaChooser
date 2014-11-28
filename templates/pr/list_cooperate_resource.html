@@ -1,0 +1,95 @@
+{% extends "ad_resource_mgmt/mp_base.html" %}
+{% load filters_extra %}
+{% block rightpanel %}
+    <div id="right"><h2>外协资源列表页面</h2>
+        <a href="{% url add_cooperate_resource %}">增加</a><br>
+        <form action="{% url batch_add_cooperate_resource_by_excel %}" method="post" id="cooperate_resource_form" enctype="multipart/form-data">
+            上传外协资源: <input type="file" id="cooperate_resource_file" name="cooperate_resource_file">
+            <input type="button" onclick="submitForm()" value="确定"/>
+            {{ ret.msg }}
+        </form>
+        <table>
+            <tr>
+                <td>公司名称</td>
+                <td>联系人</td>
+                <td>座机</td>
+                <td>手机</td>
+                <td>邮箱</td>
+                <td>服务范围</td>
+                <td>收费方式</td>
+                <td>月费包含内容</td>
+                <td>公司优势</td>
+                <td>成功案例</td>
+                <td>公司简介</td>
+                <td>报价</td>
+                <td>合作客户</td>
+                <td>合作类型</td>
+                <td>合作内容</td>
+                <td>合作金额</td>
+                <td>完成质量</td>
+                <td>媒介评分</td>
+                <td>其他</td>
+                <td>操作</td>
+            </tr>
+           {% for cooperate_resource in cooperate_resource_list%}
+            <tr>
+                <td>{{ cooperate_resource.comany_name }}</td>
+                <td>{{ cooperate_resource.contactor }}</td>
+                <td>{{ cooperate_resource.fixed_number }}</td>
+                <td>{{ cooperate_resource.mobile_number }}</td>
+                <td>{{  cooperate_resource.email}}</td>
+                <td>{{  cooperate_resource.service_area }}</td>
+                <td>{{  cooperate_resource.charge_way }}</td>
+                <td>{{  cooperate_resource.month_cost_content }}</td>
+                <td>{{  cooperate_resource.company_advantage }}</td>
+                <td>{{  cooperate_resource.success_case }}</td>
+                <td>{{  cooperate_resource.company_introduction }}</td>
+                <td>{{  cooperate_resource.offer_price }}</td>
+                <td>{{  cooperate_resource.cooperate_client }}</td>
+                <td>{{  cooperate_resource.cooperate_type }}</td>
+                <td>{{  cooperate_resource.cooperate_content }}</td>
+                <td>{{  cooperate_resource.cooperate_amount }}</td>
+                <td>{{  cooperate_resource.finish_quality }}</td>
+                <td>{{  cooperate_resource.media_score }}</td>
+                <td>{{  cooperate_resource.other_info }}</td>
+                <td><a href="{% url edit_cooperate_resource cooperate_resource.id %}">编辑</a><a href="{% url delete_cooperate_resource cooperate_resource.id %}" onclick="return confirm('确定删除吗?')">删除</a></td>
+            <tr>
+           {% empty %}
+            <tr><td  colspan="20">没有任何数据</td></tr>
+           {% endfor %} 
+           </table>
+        </div>
+{% endblock %}
+{% block js %}
+    <script type="text/javascript" src="/media-{{ request.path|first_subpath }}/js/jquery.form.js"></script>
+    <script type="text/javascript">
+        String.prototype.endWith=function(str){
+            if(str==null||str==""||this.length==0||str.length>this.length)
+              return false;
+            if(this.substring(this.length-str.length)==str)
+              return true;
+            else
+              return false;
+            return true;
+            }
+        function submitForm(){
+            file_path = $('#cooperate_resource_file').val();
+            if(file_path == ''){
+                alert('上传文件不能为空');                
+            }else if(!file_path.endWith('xls')){
+                alert('请上传.xsl结尾的excel文件');                                                                
+            }else{
+                $('#cooperate_resource_form').ajaxSubmit(function(data){
+                    if(data != 'succesful'){
+                        alert(data);
+                    }else{
+                        alert('上传成功');
+                       location.reload();   
+                    }                                                
+                });  
+                  
+            }
+                   
+        }
+    </script>
+{% endblock %}

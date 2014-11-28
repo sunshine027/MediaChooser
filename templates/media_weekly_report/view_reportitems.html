@@ -1,0 +1,337 @@
+{% extends "media_weekly_report/weekly_report_base.html" %}
+
+{% block content %}
+<p>当前用户: {% if user.last_name %}{{ user.last_name }}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}</p>
+
+<!-- <div style="width:40%; float: left;"> -->
+<div style="float: left;">
+<form action="" method="POST" id="form_reportitem">
+    <table id="table_report_slt" border="0" style="table-layout: fixed;">
+        <thead>
+            <tr>
+                <th style="width: 14%;"><label for="id_start_day">开始日期</label></th>
+                <th style="width: 14%;"><label for="id_end_day">结束日期</label></th>
+                <th style="width: 8%;"><label for="id_work_type">工作类型</label></th>
+                <th style="width: 12%;"><label for="id_work_subtype">工作类别</label></th>
+                <th style="width: 10%;"><label for="id_client">客户名称</label></th>
+                <th style="width: 6%;"><label for="id_usrname">负责人</label></th>
+                <th style="width: 22%;"><label for="id_project">项目名称</label></th>
+                <th style="width: 7%;"><label>搜索周报</label></th>
+                <th style="width: 7%;"><label>下载报表</label></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ form.start_day }}</td>
+                <td>{{ form.end_day }}</td>
+                <td>{{ form.work_type }}</td>
+                <td>{{ form.work_subtype }}</td>
+                <td>{{ form.client }}</td>
+                <td>
+                    <select id="id_usr">
+                    <option value="" selected="selected">---------</option>
+                    {% for usr in usr_list %}
+                        <option value="{{ usr.id }}">{{ usr.last_name }}{{ usr.first_name }}</option>
+                    {% endfor %}
+                    </select>
+                    </td>
+                <td>{{ form.project }}</td>
+                <!-- toggle_scenario -->
+                <td><a id="global_search" href="#" onclick="globalSearch();return false;">搜索周报</a></td>
+                <td><a id="id_get_xls" href="#" onclick="get_xls();return false;">下载报表</a></td>
+            </tr>
+        </tbody>
+    </table>    
+    <input type="hidden" value="" name="id" />
+</form>
+<span id='m_tip' style="width:15%;display:none;color:#eeeeee;background-color:#dd0000;"> 修改中……</span>
+</div>
+
+<div style="clear: both;border-bottom: 1px solid #ccc;">
+统计
+<p id="ofc_charts">
+</p>
+<table id ="static_table" border="0" class="display">
+    <thead>
+        <tr>
+            <th>时长</th>
+            <th>营业额</th>
+            <th>利润</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td id="stat_duration"></td>
+            <td id="stat_revenue"></td>
+            <td id="stat_profit"></td>
+        </tr>
+    </tbody>
+</table>
+
+</div>
+
+<table cellpadding="0" cellspacing="0" border="0" class="display" id="items_table">
+    <thead>
+        <tr>
+            <th>开始日期</th>
+            <th>结束日期</th>
+            <th>工作类型</th>
+            <th>客户名称</th>
+            <th>负责人</th>
+            <th>项目名称</th>
+            <th>工作类别</th>
+            <th>工作描述</th>
+            <th>工作时长</th>
+            <th>营业额</th>
+            <th>利润</th>
+        </tr>
+    </thead>
+    <tbody id='items_table_tbody' >
+        {% for item in items %}
+            <tr>
+                <td>{{ item.start_day }}</td>
+                <td>{{ item.end_day }}</td>
+                <td>{{ item.work_type.name }}</td>
+                <td>{{ item.client.c_name }}</td>
+                <td>{{ item.responsible_user.username }}</td>
+                <td>{{ item.project.name}}</td>
+                <td>{{ item.work_subtype.name }}</td>
+                <td>{{ item.desc }}</td>
+                <td>{{ item.duration }}</td>
+                <td>{% ifequal item.work_subtype.name "排期下单" %}{{ item.project.revenue|default_if_none:"" }}{% endifequal %}</td>
+                <td>{% ifequal item.work_subtype.name "排期下单" %}{{ item.project.profit|default_if_none:"" }}{% endifequal %}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+{% endblock %}
+
+{% block js %}
+
+<script type="text/javascript" src="/static_files/swfobject.js">
+    {{ ofc_objs }}
+</script>
+<script type="text/javascript">
+
+function reportitem_submit() {
+    $("#form_reportitem").submit();
+}
+
+function cursor_wait() {
+document.body.style.cursor = 'wait';
+}
+
+function cursor_clear() {
+document.body.style.cursor = 'default';
+}
+
+// create client
+function createClient() {
+    var client_c_name = $("#id_client_c_name").val();
+    var client_e_name = $("#id_client_e_name").val();
+    var client_desc = $("#id_client_desc").val();
+    if (client_c_name == '' || client_e_name == '') { $("#create_client").append("<p class='warning'>请输入客户名称</p>"); } else {
+        var tmp = location.pathname.split('/');
+        tmp[tmp.length-2] = 'create-client'; 
+        tmp[tmp.length-3] = 'client'       
+        $.post(tmp.join('/'), {c_name:client_c_name, e_name:client_e_name, desc:client_desc}, function(data){ 
+            j_data=eval(data);
+            if(j_data[0] == 0) { 
+                $("#create_client form").nextAll().empty();
+                $("#create_client").append("<p class='warning'>"+j_data[1]+"</p>"); 
+            } else {
+                $("#id_client_c_name").val("");$("#id_client_e_name").val("");$("#id_client_desc").val("");
+                $("#create_client form").nextAll().empty();
+                $("#id_client").append("<option value='"+j_data[1][0]+"'>"+j_data[1][1]+"</option>");
+                $("#id_client").val(j_data[1][0]);                
+            }
+        });
+    } 
+}
+function createProject() {
+    var proj_client_id = $("#id_project_client_id").val();
+    var proj_name = $("#id_project_name").val();
+    var proj_revenue = $("#id_project_revenue").val();
+    var proj_profit = $("#id_project_profit").val();
+    if (proj_client_id == '' || proj_name == '') { $("#create_project").append("<p class='warning'>请确保客户名称及项目名称正确</p>"); } else {
+        var tmp = location.pathname.split('/');
+        tmp[tmp.length-2] = 'create-project';       
+        $.post(tmp.join('/'), {client_id:proj_client_id, name:proj_name, revenue:proj_revenue, profit:proj_profit}, function(data){ 
+            j_data=eval(data);
+            if(j_data[0] == 0) { 
+                $("#create_project form").nextAll().empty();
+                $("#create_project").append("<p class='warning'>"+j_data[1]+"</p>"); 
+            } else {
+                $("#id_project_name").val("");$("#id_project_revenue").val("");$("#id_project_profit").val("");
+                $("#create_project form").nextAll().empty();
+                $("#id_project").append("<option value='"+j_data[1][0]+"'>"+j_data[1][1]+"</option>");
+                $("#id_project").val(j_data[1][0]);                
+            }
+        });        
+    }
+}
+
+function modifyReport(id){
+    var pth = location.pathname.split('/');
+    pth[pth.length-2] = 'get-report';
+    
+    $.post(pth.join('/'), {report_id:id}, function (data){    
+        j_data = eval(data)[0];
+        // setup the values of form's child element
+        $("#id_start_day").val(j_data.start_day);
+        $("#id_end_day").val(j_data.end_day);
+        $("#id_work_type").val(j_data.work_type).change();
+        $("#id_client").val(j_data.client).change();
+        $("#id_desc").val(j_data.desc);
+        $("#id_duration").val(j_data.duration);
+        $("#form_reportitem input[name='id']").val(j_data.id);
+        $("#form_reportitem input[type='submit']").val("修改周报");
+        setTimeout("$('#id_project').val("+j_data.project+");$('#id_work_subtype').val("+j_data.work_subtype+");", 400);
+        //$("#id_project").val(j_data.project);
+        //$("#id_work_subtype").val(j_data.work_subtype);        
+    });
+}
+
+
+function get_args(){
+    return {
+        "start_day":    $('#id_start_day').val(),
+        "end_day":      $('#id_end_day').val(),
+        "work_type":    $('#id_work_type').val(),
+        "work_subtype": $('#id_work_subtype').val(),
+        "client":       $('#id_client').val(),
+        "project":      $('#id_project').val(),
+        "usr":          $('#id_usr').val()
+    };
+}
+
+
+function _donwload(url, data, method){
+    if( url && data ){ 
+        data = typeof data == 'string' ? data : jQuery.param(data);
+        var inputs = '';
+        jQuery.each(data.split('&'), function(){ 
+            var pair = this.split('=');
+            inputs+='<input type="hidden" name="'+ pair[0] +'" value="'+ pair[1] +'" />'; 
+        });
+        jQuery('<form action="'+ url +'" method="'+ (method||'post') +'">'+inputs+'</form>')
+        .appendTo('body').submit().remove();
+    };
+}
+
+function get_xls() {
+    var pth = location.pathname.split('/');
+    pth[pth.length-2] = 'get-statics-xls';
+    _donwload(pth.join('/'), get_args(), 'post');
+}
+
+function globalSearch(){
+
+    cursor_wait();
+    $('#global_search').replaceWith('<a id="global_search" disabled=true>搜索周报</a>');
+
+    var pth = location.pathname.split('/');
+    pth[pth.length-2] = 'get-statics';
+    $.post(pth.join('/'), get_args(), function (data){
+        $('#items_table_wrapper').remove()
+        j_data = eval(data);
+        $('#content-main').append(j_data[1]);
+        $('#stat_duration').text(j_data[2].stat_duration);
+        $('#stat_revenue').text(j_data[2].stat_revenue);
+        $('#stat_profit').text(j_data[2].stat_profit);
+        report_item_table = $("#items_table").dataTable({
+            		"bPaginate": true,
+                    "iDisplayLength": 20,
+                    "bSort": true,
+            		"bInfo": true,
+            		"bLengthChange": false,
+            		"aoColumns": [{"sType":"string"}, {"sType":"string"}, null, null, null, null, null, null, null, null, null], /*null{"bSearchable": false, "bSortable": false}, {"bSearchable": false, "bSortable": false}],*/
+            		"oLanguage": {
+            			"sInfo": "共 _TOTAL_ 条周报",
+            			"sInfoFiltered": "(从 _MAX_ 条周报中过滤获得)",
+            			"sSearch": "搜索",
+                        "sInfoEmpty": "共 0 个文件/文件夹",
+                        "sZeroRecords": "无匹配项" 
+            		},
+            		"sDom": '<"top"if>ptrp'
+            	});    
+        cursor_clear();
+        $('#global_search').replaceWith('<a id="global_search" href="#" onclick="globalSearch();return false;">搜索周报</a>');
+    });
+
+}
+
+
+jQuery.fn.dataTableExt.oSort['null-asc']  = function(x,y) {  
+    return ((x < y) ? -1 : ((x > y) ?  1 : 0));  
+};  
+jQuery.fn.dataTableExt.oSort['null-desc'] = function(x,y) {  
+    return ((x < y) ?  1 : ((x > y) ? -1 : 0));  
+}; 
+
+var report_item_table;
+$(document).ready(function() {
+    $("#ofc_charts").empty()
+    report_item_table = $("#items_table").dataTable({
+            		"bPaginate": true,
+                    "iDisplayLength": 20,
+                    "bSort": true,
+            		"bInfo": true,
+            		"bLengthChange": false,
+            		"aoColumns": [{"sType":"string"}, {"sType":"string"}, null, null, null, null, null, null, null, null, null], /*null{"bSearchable": false, "bSortable": false}, {"bSearchable": false, "bSortable": false}],*/
+            		"oLanguage": {
+            			"sInfo": "共 _TOTAL_ 条周报",
+            			"sInfoFiltered": "(从 _MAX_ 条周报中过滤获得)",
+            			"sSearch": "搜索",
+                        "sInfoEmpty": "共 0 个文件/文件夹",
+                        "sZeroRecords": "无匹配项" 
+            		},
+            		"sDom": '<"top"if>ptrp'
+            	});    
+    
+    $("#id_work_type").change(function() {
+        var slt = $("#id_work_type").val()
+        if(slt != '') {
+            var tmp = location.pathname.split('/');
+            tmp[tmp.length-2] = 'get-subtypes';
+            $.post(tmp.join('/'), {parent_id:slt}, function(data) {
+                $("#id_work_subtype").empty().append("<option value='' selected='selected'>---------</option>");
+                j_data = eval(data);
+                $.each(j_data, function(k, item){
+                    $("#id_work_subtype").append("<option value='"+item.id+"'>"+item.name+"</option>");
+                });
+            });
+        } 
+        return false;
+    });
+
+    $("#id_client").change(function() {
+        var slt = $("#id_client").val()
+        if(slt != '') {
+            var tmp = location.pathname.split('/');
+            tmp[tmp.length-2] = 'get-projects';
+            $.post(tmp.join('/'), {client_id:slt}, function(data) {
+                $("#id_project").empty().append("<option value='' selected='selected'>---------</option>");
+                j_data = eval(data);
+                $.each(j_data, function(k, item){
+                    $("#id_project").append("<option value='"+item.id+"'>"+item.name+"</option>");
+                });
+            });
+        } 
+        return false;
+    });
+    
+    $("#id_project_client_name").text($("#id_client :selected").text());
+    $("#id_project_client_id").val($("#id_client :selected").val());
+    $("#id_client").change(function() {
+        $("#id_project_client_name").text($("#id_client :selected").text());
+        $("#id_project_client_id").val($("#id_client :selected").val());
+    });
+    
+});
+
+$
+</script>
+{% endblock %}

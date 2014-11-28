@@ -1,0 +1,118 @@
+{% extends "ad_resource_mgmt/mp_base.html" %}
+{% load filters_extra %}
+{% block rightpanel %}
+    <div id="right"><h2>媒体资源列表页面</h2>
+        <a href="{% url add_media_resource %}">增加</a><br>
+        <form action="{% url batch_add_media_resource_by_excel %}" method="post" id="media_resource_form" enctype="multipart/form-data">
+            上传媒体资源: <input type="file" id="media_resource_file" name="media_resource_file">
+            <input type="button" onclick="submitForm()" value="确定"/>
+            {{ ret.msg }}
+        </form>
+        <form id="media_name_form" action="{% url list_human_resource_by_media %}" method="post">
+            <input type="hidden" id="media_name" name="media_name">
+        </form>
+        <table>
+            <tr>
+                <td>省份</td>
+                <td>城市</td>
+                <td>媒体名称</td>
+                <td>媒体类型</td>
+                <td>一级分类</td>
+                <td>二级分类</td>
+                <td>媒体级别</td>
+                <td>网址</td>
+                <td>排名</td>
+                <td>访问量</td>
+                <td>主管单位</td>
+                <td>办公地址</td>
+                <td>媒体定位</td>
+                <td>版面构成及特点</td>
+                <td>受众构成</td>
+                <td>受众年龄段</td>
+                <td>受众浏览爱好</td>
+                <td>受众价值取向</td>
+                <td>受众男女比例</td>
+                <td>成立日期</td>
+                <td>公关稿件要求</td>
+                <td>网站管理体制</td>
+                <td>上线流程</td>
+                <td>简介</td>
+                <td>备注</td>
+                <td>操作</td>
+                <td>进入人力资源</td>
+            </tr>
+           {% for media_resource in media_resource_list%}
+            <tr>
+                <td>{{ media_resource.province }}</td>
+                <td>{{ media_resource.city }}</td>
+                <td>{{ media_resource.media_name }}</td>
+                <td>{{  media_resource.media_type}}</td>
+                <td>{{  media_resource.first_category }}</td>
+                <td>{{  media_resource.second_category }}</td>
+                <td>{{  media_resource.media_level }}</td>
+                <td>{{  media_resource.url }}</td>
+                <td>{{  media_resource.ranking }}</td>
+                <td>{{  media_resource.visits }}</td>
+                <td>{{  media_resource.domain_company }}</td>
+                <td>{{  media_resource.office_address }}</td>
+                <td>{{  media_resource.media_location }}</td>
+                <td>{{  media_resource.page_compose_feature }}</td>
+                <td>{{  media_resource.accepter_compose }}</td>
+                <td>{{  media_resource.accepter_age_bracket }}</td>
+                <td>{{  media_resource.accepter_hobbies }}</td>
+                <td>{{  media_resource.accepter_value_orientation }}</td>
+                <td>{{  media_resource.accepter_proportion }}</td>
+                <td>{% if media_resource.found_day %}
+                        {{  media_resource.found_day }}
+                    {% endif %}
+                </td>
+                <td>{{  media_resource.pr_contribution_require }}</td>
+                <td>{{  media_resource.website_management }}</td>
+                <td>{{  media_resource.rollout_flow }}</td>
+                <td>{{  media_resource.introduction }}</td>
+                <td>{{  media_resource.remark }}</td>
+                <td><a href="{% url edit_media_resource media_resource.id %}">编辑</a><a href="{% url delete_media_resource media_resource.id %}" onclick="return confirm('确定删除吗?')">删除</a></td>
+                <td><a href="" onclick="showHumanResource('{{media_resource.media_name}}');return false;">人力资源</a></td>
+            <tr>
+           {% empty %}
+            <tr><td  colspan="26">没有任何数据</td></tr>
+           {% endfor %} 
+        </table>
+    </div>
+{% endblock %}
+{% block js %}
+    <script type="text/javascript" src="/media-{{ request.path|first_subpath }}/js/jquery.form.js"></script>
+    <script type="text/javascript">
+        String.prototype.endWith=function(str){
+            if(str==null||str==""||this.length==0||str.length>this.length)
+              return false;
+            if(this.substring(this.length-str.length)==str)
+              return true;
+            else
+              return false;
+            return true;
+            }
+        function submitForm(){
+            file_path = $('#media_resource_file').val();
+            if(file_path == ''){
+                alert('上传文件不能为空');                
+            }else if(!file_path.endWith('xls')){
+                alert('请上传.xsl结尾的excel文件');                                                                
+            }else{
+                $('#media_resource_form').ajaxSubmit(function(data){
+                    if(data != 'succesful'){
+                        alert(data);
+                    }else{
+                       alert('上传成功');
+                       window.location.reload();   
+                    }                                                
+                });  
+                  
+            }
+        }
+        function showHumanResource(val){
+            $('#media_name').val(val);
+            $('#media_name_form').submit();                         
+        }
+    </script>
+{% endblock %}

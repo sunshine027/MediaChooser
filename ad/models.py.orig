@@ -1,0 +1,65 @@
+#! /usr/bin/env python
+#coding=utf-8
+
+from django.db import models
+from MediaChooser.media.models import Media, Channel
+from MediaChooser.client.models import Client
+
+# 广告形式表
+class AdType(models.Model):
+    AD_CATEGORY_CHOICES = ((1, '硬广'),(2, '软广'),(3, '专题'),(4, '活动'),)
+
+    category = models.PositiveSmallIntegerField('分类', choices=AD_CATEGORY_CHOICES, help_text='分类')
+    c_name = models.CharField('中文名称', max_length=40, help_text='中文名称')
+    e_name = models.CharField('英文名称', max_length=40, help_text='英文名称', blank=True, null=True)
+    desc = models.TextField('描述', blank=True, null=True, help_text='描述')
+    demo = models.FileField('演示', upload_to='files/', blank=True, null=True, help_text='演示')
+    advantage = models.TextField('优势', blank=True, null=True, help_text='优势')
+    disadvantage = models.TextField('劣势', blank=True, null=True, help_text='劣势')
+    class Meta:
+        verbose_name = '广告形式'
+        verbose_name_plural = '广告形式'
+    def __unicode__(self):
+        return self.c_name
+
+# 投放类型
+class ActivityType(models.Model):
+    name = models.CharField('名称', max_length=20, help_text='活动名称')
+    desc = models.TextField('描述', null=True, blank=True, help_text='描述')
+
+    class Meta:
+        verbose_name = '活动类型'
+        verbose_name_plural = '活动类型'
+
+class Ad(models.Model):
+    client   = models.ForeignKey(Client, verbose_name='广告主')
+    #adtype = models.ForeignKey(AdType, verbose_name='类型', related_name='related_adinfo')
+    activity_type = models.ForeignKey(ActivityType)
+    #product  = models.ForeignKey(Product)
+    #minisite = models.ForeignKey(MiniSite)
+    DE_campaign_id = models.IntegerField('campaign_id', unique=True, help_text='campaign_id')
+    name  = models.CharField('name', help_text='name', max_length=256)
+
+    #title = models.CharField('title', help_text='title', max_length=96)
+    desc = models.TextField('desc', blank=True, null=True, help_text='desc')
+
+    #targeting = models.DateField()
+    start_day = models.DateField('开始日期', help_text='开始日期')
+    end_day = models.DateField('结束日期', help_text='结束日期')
+    create_time = models.DateTimeField('创建日期', auto_now_add=True, null=True, help_text='创建日期')
+    last_modified = models.DateTimeField('最后修改', auto_now=True, null=True, help_text='最后修改')
+
+    class Meta:
+        verbose_name = 'Campaign'
+        verbose_name_plural = 'Campaign'
+
+#
+#class DE_Cmpaign_Processed(models.Model):
+#    #all follow fields are for DE
+#    campaignid  = models.IntegerField('CampaignID', help_text='CampaignID')
+#    flightid    = models.IntegerField('FlightID', help_text='FlightID')
+#    flightname  = models.CharField('FlightName', max_length=64, help_text='FlightName')
+#    flightnum   = models.IntegerField('FlightNum', help_text='FlightNum')
+#    class Meta:
+#        verbose_name = '已导入的排期'
+#        verbose_name_plural = '已导入的排期'

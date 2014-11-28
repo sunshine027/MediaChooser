@@ -1,0 +1,45 @@
+{% extends "ad_resource_mgmt/mp_detail_base.html" %}
+{% load filters_extra %}
+{% block uppanel %}
+    <div>
+        <div>媒体效果对比</div>
+        <a title="导出excel文件" href="{% url get_campaign_media_cpc_xls campaign_id %}"><img src="/media-{{ request.path|first_subpath }}/images/icon_excel.gif" border=0 /></a>
+        <div id="cpc_media_chart">
+            You need to install or upgrade your flash player
+        </div>
+        <!--<div id="fcexpDiv" align="center">FusionCharts Export Handler Component</div>-->
+    </div>        
+{% endblock %}
+{% block downpanel %}
+    <div>
+        <table id="mp_info">
+            <tr>
+                <td>媒体</td>
+                <td>cpc</td>
+                <td>click</td>
+            </tr>
+            {% for key, value in result.items %}
+                <tr>
+                    <td>{{ key }}</td>
+                    {% for val in value %}
+                    <td>{{ val }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    </div>     
+{% endblock %}
+{% block js %}
+    <script language="JavaScript" src="/media-{{ request.path|first_subpath }}/fusioncharts/js/FusionCharts.js"></script>   
+    <script type="text/javascript" src="/media-{{ request.path|first_subpath }}/fusioncharts/js/FusionChartsExportComponent.js"></script> 
+    <script type="text/javascript">
+        $('document').ready(function(){
+            var cpc_media_chart = new FusionCharts("/media-{{ request.path|first_subpath }}/fusioncharts/charts/MSCombiDY2D.swf", "myChartId", "80%", "400", "0", "0");
+            cpc_media_chart.setJSONUrl("{% url get_chart_api campaign_id 'media_click_cpc_bar' %}");
+            cpc_media_chart.render("cpc_media_chart");    
+           // var myExportComponent = new FusionChartsExportObject("fcExporter1", "/media-{{ request.path|first_subpath }}/fusioncharts/charts/FCExporter.swf");
+            //myExportComponent.Render("fcexpDiv");                      
+        });
+        
+    </script>      
+{% endblock %}

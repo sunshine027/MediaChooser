@@ -1,0 +1,288 @@
+{% extends "ad_resource_mgmt/mp_base.html" %}
+{% load filters_extra %}
+{% block rightpanel %}
+
+<h3 class="title">单排期效果(<a href="{% url get_campaign_detail campaign_id %}">详细</a>)
+    <a title="导出excel文件" href="{% url get_campaign_xls campaign_id %}"><img src="/media-{{ request.path|first_subpath }}/images/icon_excel.gif" border=0 /></a></h3>
+<form id="creative_form" method="post" action="{% url upload_creative %}" enctype="multipart/form-data">
+	<input type="hidden" name="campaign_id" value="{{ campaign_id }}"/>
+	<input type="file" id="creative_file" name="creative_file"/>
+	<input type="button" id="upload_creative" value="上传广告创意"/>
+</form>
+
+<form id="delete_creative_form" method="post" action="{% url delete_upload_creative %}">
+    <input type="hidden" name="campaign_id" value="{{ campaign_id }}"/>
+    <input type="hidden" id="creative_file_name" name="creative_file_name"/>
+</form>
+<div id="dialog" title="修改排期名" style="display:none;z-index:10000;">
+	<form>
+	<fieldset>
+		<input type="text" name="flightname" id="flightname" size="50" class="text ui-widget-content ui-corner-all" value="{{campaign.name}}">
+	</fieldset>
+	</form>
+</div>
+<div class="indent2">
+<TABLE id="mp_info">
+<TR>
+	<TD width="70px">排期ID:</TD>
+	<TD>{{ campaign_id }}</TD>
+	<TD width="120px">平均CPC:</TD>
+	<TD width="120px">{{ campaign.cpc|floatformat:2 }}</TD>
+</TR>
+<TR>
+	<TD>排期名:</TD>
+	<TD><span id="show_campaign_name">{{ campaign.name }}</span> <input id="change_flightname" type="button" value="修改"></TD>
+	<TD>总click数:</TD>
+	<TD>{{ campaign.click }}</TD>
+</TR>
+<TR>
+	<TD>开始日期:</TD>
+	<TD>{{ campaign.start_day }}</TD>
+	<TD>总投放金额:</TD>
+	<TD>{{ campaign.spending }} 元</TD>
+</TR>
+<TR>
+	<TD>结束日期:</TD>
+	<TD>{{ campaign.end_day }}</TD>
+	<TD>实际有效金额<img src="http://www.cn06.cn/Article/UploadFiles/200902/20090219094320613.gif" title="监测到点击数的投放金额">:</TD>
+	<TD>{{ real_price }} 元</TD>
+</TR>
+<TR>
+        <TD>上传者:</TD>
+	<TD>{{ campaign.uploader.last_name }}{{campaign.uploader.first_name}}</TD>
+	<TD>相关人员:</TD>
+	<TD>{% for r in related_staff %}{{r.last_name}}{{r.first_name}}{%endfor%}</TD>
+</TR>
+</TABLE>
+<input type="button" value="更新后台代码" onclick="updateURL('{{ campaign_id }}')"/>
+
+<div class="info">
+	<div id="date_cpc_click_chart">
+		You need to install or upgrade your flash player
+	</div>
+	<div>
+		查看详细
+	</div>
+</div>
+
+<div class="info">	
+	<div id="cpc_media_chart">
+		You need to install or upgrade your flash player
+	</div>
+	<div>
+		查看详细
+	</div>
+</div>
+
+<div class="info">	
+	<div id="price_media_chart">
+			You need to install or upgrade your flash player
+	</div>
+	<div>
+		查看详细
+	</div>
+</div>
+
+<div class="info">	
+	<div id="funnel_chart">
+	   The chart will appear within this DIV. This text will be replaced by the chart.
+	</div>
+	<div>
+		查看详细
+	</div>
+</div>
+
+{% if ubs %}
+<div id="ub-table" style="clear:both;">
+	<h3>用户行为数据</h3>
+	<table style="width:80%;">
+		<tr>
+			<td colspan='3' style="text-align:center">媒体</td>
+			<td colspan='3' style="text-align:center">点击数据</td>
+			<td colspan='8' style="text-align:center">用户行为数据</td></tr>
+		<tr>
+	<td width="10%">媒体</td><td width="16%">频道</td><td width="10%">广告位</td>
+	<td>前点击</td><td>visits</td><td>流失率</td><td>PageViews</td>
+	{% ifequal tracking 'ga' %}<td width="15%">平均停留时长(秒)</td>{% endifequal %}
+	{% ifequal tracking 'ga' %}<td>跳出率</td>{% endifequal %}
+	{% ifequal tracking 'om' %}<td width="7%">ub</td>{% endifequal %}
+	{% ifequal tracking 'om' %}<td width="7%">产品详情页</td>{% endifequal %}
+	{% ifequal tracking 'om' %}<td width="7%">购物车</td>{% endifequal %}
+	{% ifequal tracking 'om' %}<td width="7%">checkout</td>{% endifequal %}
+	{% ifequal tracking 'om' %}<td width="7%">order</td>{% endifequal %}
+	{% ifequal tracking 'om' %}<td width="7%">revenue</td>{% endifequal %}
+	<td>tracking code</td>
+	<!-- <td>date</td> -->
+	</tr>		
+		{% for ub in ubs %}
+				
+
+		<tr>
+				<!--<td>{{ub.averate_time_onsite }}</td>-->
+			<td>{{ ub.media }}</td><td>{{ ub.channel }}</td><td>{{ ub.adform }}</td>
+			<td>{{ ub.click }}</td><td>{{ ub.visits }}</td><td>{{ ub.loss }}%</td><td>{{ ub.pv }}</td>
+				{% ifequal tracking 'ga' %}<td>{{ ub.avg_time }}</td>{% endifequal %}
+				{% ifequal tracking 'ga' %}<td>{{ ub.bounce_rate }}%</td>{% endifequal %}
+				{% ifequal tracking 'om' %}<td>{{ ub.uv }}</td>{% endifequal %}
+				{% ifequal tracking 'om' %}<td>{{ ub.products_view }}</td>{% endifequal %}
+				{% ifequal tracking 'om' %}<td>{{ ub.cart_addition }}</td>{% endifequal %}
+				{% ifequal tracking 'om' %}<td>{{ ub.checkouts }}</td>{% endifequal %}
+				{% ifequal tracking 'om' %}<td>{{ ub.orders }}</td>{% endifequal %}
+				{% ifequal tracking 'om' %}<td>{{ ub.revenue }}</td>{% endifequal %}
+				<td>{{ ub.tracking_code }}</td>
+				<!-- <td>{{ ub.startdate }}</td> -->
+		</tr>			
+		{% endfor %}
+	</table>
+</div>
+{% endif %}
+
+广告创意展示
+<table id="creative_table">
+    <tr>
+        <td>创意展示</td>
+        <td>操作</td>
+    </tr>
+{% for creative in ad_creatives %}
+    <tr>
+	{% if creative.is_flash %}
+        <td>
+    		<object id="pic" classid="clsid27CDB6E-AE6D-11cf-96B8-444553540000" codebase="https://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,19,0">
+    			<param name="movie"value="{{ creative.creative.url }}">
+    			<param name="WMode"value="Transparent">
+    			<embed src="{{ creative.creative.url }}" quality="high" pluginspage=" http://www.macromedia.com/go/getflashplayer" type="application/x-shockwave-flash">
+    		</object>
+        </td>
+	{% else %}
+        <td><img src="{{ creative.creative.url }}"/></td>
+	{% endif %}
+    <td><input type="button" value="删除" onclick="fillValue('{{creative.creative.name}}');"/></td>
+    </tr>
+    {% empty %}
+        <tr><td colspan="2">暂无广告创意</td></tr>
+{% endfor %}
+</table>
+{% endblock %}
+
+{% block js %}
+<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/ui-lightness/jquery-ui.css" type="text/css" media="all" />
+
+
+<style type="text/css">
+	.info {margin: 10px 38px 10px 0; float:left;}
+</style>
+<script type="text/javascript" src="/media-{{ request.path|first_subpath }}/js/jquery.form.js"></script>
+<script type="text/javascript" src="/media-{{ request.path|first_subpath }}/js/jquery-ui-1.7.2.custom.min.js"></script>
+
+
+<script language="JavaScript" src="/media-{{ request.path|first_subpath }}/fusioncharts/js/FusionCharts.js"></script>
+<script type="text/javascript">
+
+   var funnel_chart = new FusionCharts("/media-{{ request.path|first_subpath }}/fusioncharts/charts/Funnel.swf", "chart_funnel", "425", "350", "0", "0");
+   funnel_chart.setDataURL("{% url get_chart_api campaign_id 'funnel_chart' %}");
+   funnel_chart.render("funnel_chart");
+
+   var price_media_chart = new FusionCharts("/media-{{ request.path|first_subpath }}/fusioncharts/charts/Pie2D.swf", "myChartId", "425", "350", "0", "0");
+   price_media_chart.setJSONUrl("{% url get_chart_api campaign_id 'media_price_pie' %}");
+   price_media_chart.render("price_media_chart");
+
+   var date_cpc_click_chart = new FusionCharts("/media-{{ request.path|first_subpath }}/fusioncharts/charts/ScrollCombiDY2D.swf", "myChartId", "425", "350", "0", "0");
+   date_cpc_click_chart.setJSONUrl("{% url get_chart_api campaign_id 'date_click_cpc_line' %}");
+   date_cpc_click_chart.render("date_cpc_click_chart");
+
+   var cpc_media_chart = new FusionCharts("/media-{{ request.path|first_subpath }}/fusioncharts/charts/MSCombiDY2D.swf", "myChartId", "425", "350", "0", "0");
+   cpc_media_chart.setJSONUrl("{% url get_chart_api campaign_id 'media_click_cpc_bar' %}");
+   cpc_media_chart.render("cpc_media_chart");
+
+</script>
+
+<script type="text/javascript">
+    function fillValue(name){
+        if(confirm('确定删除该广告创意吗')){
+            $('#creative_file_name').val(name);
+            
+            $('#delete_creative_form').ajaxSubmit(function(data){
+                if(data == 'fail'){
+                    alert('您无权删除该广告创意, 只有该排期的上传者才可以删除广告创意');
+                }else{
+                    location.reload();
+                }                                           
+            });
+        }
+    }
+
+    function updateURL(id){
+        $.getJSON('{% url update_background_code %}', {campaign_id: id}, function(data){
+                            if(data.result == 'success'){
+                                alert('更新成功');
+                            }else{
+                                alert('更新失败');  
+                            } 
+        });
+    }
+
+	$(document).ready(function(){
+        $('#upload_creative').click(function(){
+           creative_file = $('#creative_file').val();
+           if(creative_file == ''){
+                 alert('请选择要上传的广告创意图片或者flash');   
+                 return false;               
+            }else{
+                 $('#creative_form').ajaxSubmit(function(data){
+                    if(data == 'fail'){
+                        alert('您无权上传广告创意,只有该排期的上传者才可以上传广告创意');
+                    }else{
+                        $('#creative_file').val('');
+                        alert('上传成功');
+                        location.reload();
+                         //$("html,body").animate({scrollTop: $("#creative_table").offset().top}, 500);
+                        
+                    }                      
+                });
+            }                              
+        });
+		$("#dialog").dialog({
+			bgiframe: true,
+			autoOpen: false,
+			height:100,
+			width:400,
+			modal: true,
+			buttons: {
+				'取消': function() {
+					$(this).dialog('close');
+				},
+				'确定': function() {
+					path = location.pathname.split('/');
+					path.pop();path.pop();
+					path[path.length-1] = 'change_flightname';
+					$.getJSON(path.join('/'), {campaign_name:$("#flightname").attr('value'),campaign_id:{{ campaign_id }}}, function(data){
+						if (data.success == 't')
+						{
+							$("#show_campaign_name").text(data.new_name);
+							alert('修改成功！');
+						}
+					});
+					$(this).dialog('close');
+					
+				}
+			},
+			close: function() {
+				
+			}
+		});
+        
+		$("#change_flightname").click(function(){
+			if ($('#dialog').dialog('isOpen'))
+			{
+				$('#dialog').dialog('moveToTop');
+			}
+			else
+			{
+				$('#dialog').dialog('open');
+				$('#flightname').attr('value',$("#show_campaign_name").text());
+			}
+		});
+		
+	});
+</script>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "ad_resource_mgmt/mp_base.html" %}
+
+{% block rightpanel %}
+
+<div>
+
+  {% for k,v in adform_price.items %}
+    <p>{{ k }}</p>
+    
+    {% for kk, vv in v.items %}
+    <p>{{ kk}} </p>
+
+    {% endfor %}
+    <HR>
+{% endfor %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,180 @@
+{% extends "ad_resource_mgmt/mp_base.html" %}
+{% load filters_extra %}
+{% block rightpanel %}
+
+{{msg}}
+
+<form action="" method="post">
+	{% csrf_token %}
+	<P>
+		<input id="mflights" type="submit" value="多排期比较">
+		<input id="date" type="submit" value="时间趋势">
+		<input id="media" type="submit" value="媒体效果">
+	</P>
+</form>
+
+<h3 class="title">{% for c in campaign_id %}
+	{% if forloop.last %}
+		{{c}}
+	{% else %}
+		{{c}},
+	{% endif %}
+{% endfor %}号排期媒体效果对比</h3>
+
+{% for k, v in media_tree.items %}
+<div id="media_tree" class="indent2 f_mc1">
+<p class="main"><input id="{{k}}" class="media_box" type="checkbox">{{ k }}</input><input class="buttontree" type="button" value="+"></input></p><div class='mainitems' style='display:none'>
+	{% for kk, vv in v.items %}
+	
+		<p class="channel">----<input id="{{k}}->{{kk}}" class="channel_box" type="checkbox">{{kk}}</input><input class="buttontree" type="button" value="+"></input></p><div class='channelitems' style='display:none'>
+			{% for vvv in vv %}
+				
+				<p class="flight">--------<input id="{{k}}->{{kk}}->{{vvv}}" class="flight_box" type="checkbox">{{vvv}}</input></p>
+				
+			{% endfor %}</div>
+	
+	{% endfor %}</div>
+</div>
+{% endfor %}
+
+<input class="indent2" id="submitmedia" type="button" value="查看媒体效果比较">
+
+<p>
+	&nbsp;
+</p>
+
+<div id="amchart_cpc_media">
+	You need to install or upgrade your flash player
+</div>
+<!-- 
+<p><div id='cpc_media_chart'></div></p>
+-->
+
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="/media-{{ request.path|first_subpath }}/js/swfobject.js"></script>
+<script type="text/javascript" src="/media-{{ request.path|first_subpath }}/js/amswfobject.js"></script>
+<script type="text/javascript" src="/media-{{ request.path|first_subpath }}/js/json2.js"></script>
+
+<script type="text/javascript">
+	//swfobject.embedSWF("/files_dl/open-flash-chart.swf", "cpc_media_chart", "700", "400", "9.0.0");
+	
+	var so_cpc_media = new SWFObject("/media-{{ request.path|first_subpath }}/amchart/swf/amcolumn.swf",'amcolumn','800','400','8', '#FFFFFF');
+	so_cpc_media.addVariable('settings_file', encodeURIComponent('/media-{{ request.path|first_subpath }}/amchart/settings/amcolumn_settings.xml'));
+	so_cpc_media.addVariable('data_file', encodeURIComponent('/media-{{ request.path|first_subpath }}/amchart/data/empty_data.xml'));
+	//so_cpc_media.addVariable('chart_data', "Nodata;0\n");
+	so_cpc_media.write('amchart_cpc_media');
+	
+	var flashMovie;
+	
+	function amChartInited(chart_id){
+    	flashMovie = document.getElementById("amcolumn");
+	}
+	
+	function reload_amdata(){
+		if (flashMovie){
+			flashMovie.reloadData('/media-{{ request.path|first_subpath }}/amchart/data/mflights_cpc_media.xml');
+			//flashMovie.setData(encodeURIComponent('/media-{{ request.path|first_subpath }}/amchart/data/mflights_cpc_media.xml'));
+		}
+	}
+	
+</script>
+
+<script type="text/javascript">
+	
+	init_data = {{ init_data|safe }};
+
+	function ofc_ready(){}
+	
+	function open_flash_chart_data(){
+			return JSON.stringify(init_data);
+		}
+	
+	function findSWF(movieName){
+  		if (navigator.appName.indexOf("Microsoft")!= -1) {
+			return window[movieName];} 
+		else {
+			return document[movieName];
+			}
+	}
+
+	function load_chart(data){
+		tmp = findSWF("cpc_media_chart");
+		//alert(init_data);
+		x = tmp.load(JSON.stringify(data));
+		//x = tmp.load(data);
+		//x = tmp.load('<p>hello</p>');
+	}
+		
+	$(document).ready(function(){
+		
+		//$("#cpc_media_chart").hide();
+				
+		$("#media_tree .buttontree").live("click", function(){
+			val = $(this).val();
+			target = $(this).parent().next();
+			if (val == '+'){
+				$(this).attr('value', '-');
+				target.show();
+			}else{
+				$(this).attr('value', '+')
+				target.hide();
+			}
+		});
+
+		var media_list = new Array();
+		var channel_list = new Array();
+		var flight_list = new Array();
+
+		function get_boxes(){
+			media_list.length = 0;
+			channel_list.length = 0;
+			flight_list.length = 0;
+
+			$("#media_tree .media_box").each(function(){
+				if ( this.checked == true){
+					media_list.push(this.id);
+				}
+			});
+			
+			$("#media_tree .channel_box").each(function(){
+				if ( this.checked == true){
+					channel_list.push(this.id);
+				}
+			});
+
+			$("#media_tree .flight_box").each(function(){
+				if ( this.checked == true){
+					flight_list.push(this.id);
+				}
+			});
+		};
+		
+		$("#submitmedia").click(function(){
+			get_boxes();
+			path = location.pathname.split('/');
+			path[path.length-2] = 'query_media';
+			//$("#jshere").empty();
+			//$("#jshere").append("<script type='text/javascript'>swfobject.embedSWF('/files_dl/open-flash-chart.swf', //'cpc_media_chart', '700', '300', '9.0.0');<\/script><p><div id='cpc_media_chart'></div></p>");
+			$.getJSON(path.join('/'), {campaign_id:{{campaign_id}}.toString(), media_list:media_list.join('|'), flight_list:flight_list.join('|'),channel_list:channel_list.join('|')}, function(data){
+				//load_chart(data);
+				reload_amdata();
+			});
+		});
+
+		$(":submit").click(function(){
+			url = '../mflights/?source=' + this.id + '&data=';
+			{% for d in campaign_id %}
+				{% if forloop.last %}
+					url += {{d}}
+				{% else %}
+					url += {{d}} + ','
+				{% endif %}
+			{% endfor %}
+			this.form.action = url;
+		});
+
+	});
+</script>
+{% endblock %}

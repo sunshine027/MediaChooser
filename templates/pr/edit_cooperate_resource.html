@@ -1,0 +1,89 @@
+{% extends "ad_resource_mgmt/mp_base.html" %}
+{% block rightpanel %}
+    <div id="right"><h2>编辑外协资源界面</h2>
+        {{ cooperate_resource_form.errors }}
+        <form action="{% url edit_cooperate_resource cooperate_resource.id %}" method="post">
+            <table>
+                <tr>
+                    <td>公司名称: </td>
+                    <td>{{ cooperate_resource_form.comany_name }}</td>
+                </tr>
+                <tr>
+                    <td>联系人: </td>
+                    <td>{{ cooperate_resource_form.contactor }}</td>
+                </tr>
+                <tr>
+                    <td>座机: </td>
+                    <td>{{ cooperate_resource_form.fixed_number }}</td>
+                </tr>
+                <tr>
+                    <td>手机: </td>
+                    <td>{{ cooperate_resource_form.mobile_number }}</td>
+                </tr>
+                <tr>
+                    <td>邮箱: </td>
+                    <td>{{ cooperate_resource_form.email }}</td>
+                </tr>
+                <tr>
+                    <td>服务范围: </td>
+                    <td>{{ cooperate_resource_form.service_area  }}</td>
+                </tr>
+                <tr>
+                    <td>收费方式: </td>
+                    <td>{{ cooperate_resource_form.charge_way }}</td>
+                </tr>
+                <tr>
+                    <td>月费包含内容: </td>
+                    <td>{{ cooperate_resource_form.month_cost_content }}</td>
+                </tr>
+                <tr>
+                    <td>公司优势: </td>
+                    <td>{{ cooperate_resource_form.company_advantage }}</td>
+                </tr>
+                <tr>
+                    <td>成功案例: </td>
+                    <td>{{ cooperate_resource_form.success_case }}</td>
+                </tr>
+                <tr>
+                    <td>公司简介: </td>
+                    <td>{{ cooperate_resource_form.company_introduction }}</td>
+                </tr>
+                <tr>
+                    <td>报价: </td>
+                    <td>{{ cooperate_resource_form.offer_price }}</td>
+                </tr>
+                <tr>
+                    <td>合作客户: </td>
+                    <td>{{ cooperate_resource_form.cooperate_client }}</td>
+                </tr>
+                <tr>
+                    <td>合作类型: </td>
+                    <td>{{ cooperate_resource_form.cooperate_type }}</td>
+                </tr>
+                <tr>
+                    <td>合作内容: </td>
+                    <td>{{ cooperate_resource_form.cooperate_content }}</td>
+                </tr>
+                <tr>
+                    <td>合作金额: </td>
+                    <td>{{ cooperate_resource_form.cooperate_amount }}</td>
+                </tr>
+                <tr>
+                    <td>完成质量: </td>
+                    <td>{{ cooperate_resource_form.finish_quality }}</td>
+                </tr>
+                 <tr>
+                    <td>媒介评分: </td>
+                    <td>{{ cooperate_resource_form.media_score }}</td>
+                </tr>
+                <tr>
+                    <td>其他: </td>
+                    <td>{{ cooperate_resource_form.other_info }}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><input type="submit" value="增加"/></td>
+                </tr>
+            </table>
+        </form>
+    </div>
+{% endblock %}

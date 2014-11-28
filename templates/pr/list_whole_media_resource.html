@@ -1,0 +1,42 @@
+{% extends "ad_resource_mgmt/mp_base.html" %}
+{% block rightpanel %}
+    <div id="right">
+        <form method="post" action="{% url list_search_media_resource %}" id="searchform"/>
+            <input type="hidden" name="searchtype" id="searchtype" value=""/>
+            <input type="hidden" name="searchval" id="searchval" value=""/>
+        </form>
+        <h2>媒体资源汇总页面</h2>
+        <div>信息数量显示:<a href="{% url list_media_resource %}">媒体资源{{count}}个</a>，<a href="{% url list_update_media_resource%}">近两周更新{{updatecount}}个</a> </div>
+        <div>分类查询:
+            <div>按省份划分:
+                {% for province, count in media_resource_by_province_list.items %}
+                    <span><a href="" onclick="setValue('province', '{{province}}');return false;">{{province}}({{ count}}个)</a></span>
+                {% empty %}
+                <span>暂无数据</span>
+                {% endfor %}
+            </div>
+            <div>按一级分类划分:
+                {% for first_category, count in media_resource_by_first_category_list.items %}
+                    <span><a href="" onclick="setValue('first_category', '{{first_category}}');return false;">{{first_category}}({{ count}}个)</a></span>
+                {% empty %}
+                <span>暂无数据</span>
+                {% endfor %}
+            </div>
+            <div>按媒体级别划分:
+                {% for media_level, count in media_resource_by_media_level_list.items %}
+                    <span><a href="" onclick="setValue('media_level', '{{media_level}}');return false;">{{media_level}}({{ count}}个)</a></span>
+                {% empty %}
+                <span>暂无数据</span>
+                {% endfor %}
+            </div>
+    </div>
+{% endblock %}
+{% block js %}
+    <script type="text/javascript">
+        function setValue(type, val){
+               $('#searchtype').val(type);
+               $('#searchval').val(val);
+               $('#searchform').submit();
+        }
+    </script>
+{% endblock %}

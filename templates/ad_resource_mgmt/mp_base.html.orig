@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load filters_extra %}
+
+{% block extrahead %}
+	
+	<link href="/files_dl/mediaselect.css" rel="stylesheet" type="text/css" media="screen" />
+	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/ui-lightness/jquery-ui.css" type="text/css" media="all" />
+	
+	<script type="text/javascript" src="/media-{{ request.path|first_subpath }}/js/jquery-1.3.2.min.js"></script>
+	<script type="text/javascript" src="/media-{{ request.path|first_subpath }}/js/jquery.dataTables.js"></script>
+	<script type="text/javascript" src="/media-{{ request.path|first_subpath }}/js/jquery.validate.min.js"></script>
+
+	<script type="text/javascript" src="/media/js/core.js"></script>
+	<script type="text/javascript" src="/media/js/admin/RelatedObjectLookups.js"></script>
+	<script type="text/javascript" src="/files_dl/js/jquery-ui-1.7.2.custom.min.js"></script>
+
+{% endblock %}
+
+{% block content %}
+	<div id="left">
+		<div class="left-nav-wrapper">
+		  <p>广告资源管理</p>
+		  <ul>
+		    <li id="a_query"><a href="{% url query %}">广告效果查询</a></li>
+		    <!-- <li class="normal" style="display: block;"><a href="#">媒体库</a></li>
+			  <li class="normal" style="display: block;"><a href="#">第三方数据</a></li> -->
+		  </ul>
+		</div>
+		<div class="left-nav-wrapper">
+		  <p>媒体效能分析</p>
+		  <ul>
+		    <li id="a_mediafilter"><a href="{% url media_filter %}">媒体效果</a></li>
+		  </ul>
+		</div>
+		<div class="left-nav-wrapper">
+		  <p>媒体推荐引擎</p>
+		  <ul>
+		    <li id="a_mediareco"><a href="{% url media_reco %}">媒体推荐</a></li>
+		  </ul>
+		</div>
+		<div class="left-nav-wrapper">
+		  <p>其它</p>
+		  <ul>
+		    <li id="a_upload"><a href="{% url MediaChooser.media_planning.views.upload %}">排期导入</a></li>
+		    <li id="a_my_uploads"><a href="{% url MediaChooser.media_planning.views.my_uploads %}">我上传的排期</a></li>
+		    <li id="a_uploads_checkout"><a href="{% url MediaChooser.media_planning.views.uploads_checkout %}">排期上传查询</a></li>
+		    <li id="a_mediainfo"><a href="{% url MediaChooser.media.views.get_mediainfo %}">媒体信息</a></li>
+		  </ul>
+		</div>
+		<div class="left-nav-wrapper">
+          <p>PR资源管理</p>
+          <ul>
+            <li id="a_mediaresource"><a href="{% url list_media_resource %}">媒体资源</a></li>
+            <li id="a_humenresource">个人资源
+                <ul>
+                    <li><a href="{% url list_reporter %}">记者</a></li>
+                    <li><a href="{% url list_blog_owner %}">博主</a></li>
+                    <li><a href="{% url list_moderator %}">版主</a></li>
+                    <li><a href="{% url list_other_resource %}">其他</a></li>
+                </ul>
+            </li>
+            <li id="a_foreignresource"><a href="{% url list_cooperate_resource %}">外协资源</a></li>
+          </ul>
+        </div>
+	</div>
+
+	<div id="right">
+		{% block rightpanel %}
+			
+		{% endblock %}
+	</div>
+	
+	
+{% endblock %}

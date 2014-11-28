@@ -1,0 +1,20 @@
+{% extends "ad_resource_mgmt/mp_base.html" %}
+
+{% block sectionid %}my_uploads{% endblock %}
+
+{% block rightpanel %}
+
+    <div>
+      <h2>我上传的排期</h2>
+      <div id="div_my_uploads">
+	<ul>
+	  {% for ad in uploads %}
+	  <li> <a href="{% url get_campaign ad.DE_campaign_id %}" title="{{ ad.name }}" >{{ ad.name }}</a> <br />&nbsp;&nbsp;&nbsp;&nbsp;排期ID: {{ ad.DE_campaign_id }}&nbsp;&nbsp;&nbsp;&nbsp;上传时间: {{ ad.create_time|date:"Y/m/d H:i" }}
+	  </li>
+	  {% endfor %}
+	</ul>
+      </div>
+	
+    </div>
+
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "ad_resource_mgmt/mp_base.html" %}
+{% load filters_extra %}
+{% block rightpanel %}
+    <div>
+        <a href="{% url get_campaign campaign_id %}">返回单排期效果页</a>
+        <a href="{% url get_campaign_detail_date_cpc campaign_id %}">查看排期每日cpc走势</a>
+        <a href="{% url get_campaign_detail_media_cpc campaign_id %}">查看媒体效果对比</a>
+        <a href="{% url get_campaign_detail_price_media campaign_id %}">查看媒体投放量</a>
+        <a href="{% url get_campaign_detail_funnel campaign_id %}">查看Convertion Ratio</a>
+    </div>
+    {% block uppanel %}
+            
+    {% endblock %}
+    {% block downpanel %}
+            
+    {% endblock %}
+            
+{% endblock %}

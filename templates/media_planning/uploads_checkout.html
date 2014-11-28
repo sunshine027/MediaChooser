@@ -1,0 +1,61 @@
+{% extends "ad_resource_mgmt/mp_base.html" %}
+
+{% block sectionid %}uploads_checkout{% endblock %}
+
+{% block rightpanel %}
+
+    <div>
+      <h2>排期上传查询</h2>
+      <div id="div_upload">
+	<form id="form_uploads_checkout" method="POST" action="" enctype="multipart/form-data">
+	  {% csrf_token %}
+	  <p><label for="id_uploader">上传者: </label>
+	    <select id="id_uploader" name="uploader" >
+	      <option value=""></option>
+	      {% for st in uploaders %}
+	      <option value="{{ st.id  }}" {% ifequal st.id uploader.id %} selected {% endifequal %} >
+		{% if st.last_name %}{{ st.last_name }}{{ st.first_name }}{% else %}{{ st.username }}{% endif %}
+	      </option>
+	      {% endfor %}
+	    </select>
+	  </p>
+	  <p><label for="id_start_day">开始日期：</label><input id="id_start_day" type="text" class="vDateField" name="start_day" size="10" /></p>
+	  <p><label for="id_end_day">开始日期：</label><input id="id_end_day" type="text" class="vDateField" name="end_day" size="10" /></p>
+	  <p><button type="submit">查询</button></p>
+	</form>
+      </div>
+      <div id="div_recent_uploaded">
+	{% if de_mp_dict %}
+	<h3>需上传排期 {{ de_mp_dict|length }} 个，目前上传 {{ uploaded_num }} 个</h3>
+	{% endif %}
+      	<ul>
+	  {% for key, value in de_mp_dict.items %}
+	  <li> {{ key }} : {{ value }}
+	  </li>
+	  {% endfor %}
+	</ul>
+      </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="/mc_media/js/jquery-ui-1.7.2.custom.min.js"></script>
+
+<script type="text/javascript">
+
+$(document).ready(function() {
+  $("#form_uploads_checkout").validate({
+    rules: {
+      uploader: "required"
+    },
+    messages: {}
+  });
+  $("#id_start_day").datepicker();
+  $('#id_start_day').datepicker('option', {dateFormat: 'yy-mm-dd'});
+  $("#id_end_day").datepicker();
+  $('#id_end_day').datepicker('option', {dateFormat: 'yy-mm-dd'});
+});
+
+</script>
+{% endblock %}

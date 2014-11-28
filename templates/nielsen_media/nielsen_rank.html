@@ -1,0 +1,111 @@
+{% extends "nielsen_media/nielsen_media_base.html" %}
+
+{% block content %}
+
+<p>网站排名查询:</p>
+
+<form action="" method="POST" id="form_nielsen">
+	<p>{{ form.category.errors }}<label for="id_category">分类: </label>{{ form.category }}
+	<select id="mediadropdown" disabled="disabled" name="mediadropdown"><option value="---">---</option></select>
+	</p>
+	<p>{{ form.province.errors }}<label for="id_province">省份: </label>{{ form.province }}</p>
+	<!-- <p>{{ form.media.errors }}<label for="id_media">网站: </label>{{ form.media }}</p> -->
+	<p>{{ form.week.errors }}<label for="id_week">周: </label>{{ form.week }}</p>
+
+	<input type="submit" value="查询" />
+</form>
+
+<table cellpadding="0" cellspacing="0" border="0" class="display" id="items_table">
+    <thead>
+        <tr>
+            <th>排名</th>
+            <th>中文名</th>
+            <th>域名</th>
+            <th>样本流量(TS)</th>
+            <th>样本流量(UB)</th>
+            <th>样本流量(Freq)</th>
+            <th>样本流量(ASD)</th>
+        </tr>
+    </thead>
+    <tbody id='items_table_tbody' >
+        {% for item in items %}
+            <tr>
+				<td>{{ item.rank }}</td>
+                <td>{{ item.c_name }}</td>
+                <td>{{ item.domain }}</td>
+                <td>{{ item.ts }}</td>
+                <td>{{ item.sample_ts }}</td>
+                <td>{{ item.sample_ub_freq }}</td>
+                <td>{{ item.sample_asd}}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
+
+{% block js %}
+<SCRIPT LANGUAGE="JavaScript">
+
+$(document).ready(function(){
+	
+	$('#id_category').change(function(){
+		adjustMediaDropdown()
+	});
+
+	$.fn.emptySelect = function() {
+		return this.each(function(){
+	    if (this.tagName=='SELECT') this.options.length = 0;
+	  });
+	}
+
+	$.fn.loadSelect = function(optionsDataArray) {
+		return this.emptySelect().each(function(){
+		if (this.tagName=='SELECT') {
+		var selectElement = this;
+		$.each(optionsDataArray,function(index,optionData){
+			var option = new Option(optionData.caption, optionData.value);
+			if ($.browser.msie) {
+				selectElement.add(option);
+			}else {
+				selectElement.add(option,null);
+			}
+			});
+			}
+		});
+		}
+
+	report_item_table = $("#items_table").dataTable({
+            		"bPaginate": true,
+                    "iDisplayLength": 20,
+                    "bSort": true,
+            		"bInfo": true,
+            		"bLengthChange": false,
+            		"aoColumns": [{"sType":"string"}, {"sType":"string"}, null, null, null, null, null], /*null{"bSearchable": false, "bSortable": false}, {"bSearchable": false, "bSortable": false}],*/
+            		"oLanguage": {
+            			"sInfo": "共 _TOTAL_ 条周报",
+            			"sInfoFiltered": "(从 _MAX_ 条周报中过滤获得)",
+            			"sSearch": "搜索",
+                        "sInfoEmpty": "共 0 个文件/文件夹",
+                        "sZeroRecords": "无匹配项" 
+            		},
+            		"sDom": '<"top"if>ptrp'
+            	});
+
+	});
+
+	function adjustMediaDropdown(){
+		var category = $('#id_category').val();
+		var media_dropdown = $('#mediadropdown');
+		if (category.length == 0){
+			media_dropdown.attr("disabled", true);
+			$(media_dropdown).emptySelect();
+		}else{
+			media_dropdown.attr("disabled", false);
+			path = location.pathname + 'get_media_options/'
+			$.getJSON(path, {category:category}, function(data){
+				media_dropdown.loadSelect(data);
+			});
+		}}
+</SCRIPT>
+{% endblock %}

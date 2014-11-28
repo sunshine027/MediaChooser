@@ -1,0 +1,16 @@
+{% extends "ad_resource_mgmt/mp_base.html" %}
+
+{% block rightpanel %}
+
+    <h3 class="title">用户登录</h3>
+    <form action="." method="POST" class="indent2">
+    	{% csrf_token %}
+        <p>{% if form.username.errors %}{{ form.username.html_error_list }}{% endif %}</p>
+        <p><label for="id_username"><strong>用户：</strong></label> {{ form.username }}</p>
+        <p>{% if form.password.errors %}{{ form.password.html_error_list }}{% endif %}</p>
+        <p><label for="id_password"><strong>密码：</strong></label> {{ form.password }}</p>  
+        <p><input type="hidden" name="next" value="{{ next }}" /></p>
+        <p><input type="submit" value="登录" /></p>
+    </form>
+
+{% endblock %}

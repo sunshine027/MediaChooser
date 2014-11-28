@@ -1,0 +1,185 @@
+{% extends "nielsen_media/nielsen_media_base.html" %}
+
+{% block content %}
+
+	<p>媒体重合度分析:</p>
+
+	<form action="" method="POST" id="form_overlap">
+		<p>{{ form.category_base.errors }}<label for="id_category_base">基准媒体: </label>{{ form.category_base }}
+			<select id="mediadropdown_base" disabled="disabled" name="mediadropdown_base"><option value="---">---</option></select>
+		</p>
+
+		<p>{{ form.category_comp.errors }}<label for="id_category_comp">对比媒体: </label>{{ form.category_comp }}
+			<select id="mediadropdown_comp" disabled="disabled" name="mediadropdown_comp"><option value="---">---</option></select>
+			<input id="button_add_media" type="button" value="增加">
+			<input id="button_empty_media" type="button" value="清空">
+		</p>
+		<p>
+			对比媒体列表:<span id="compmedialist"></span>
+		</p>
+		<p>{{ form.week.errors }}<label for="id_week">周: </label>{{ form.week }}</p>
+		<p>
+			<input id="button_chart" type="button" value="生成图表">
+		</p>
+	</form>
+	
+
+	<p id='p_base_media'></p>
+	
+	<div id="items_table"></div>
+	<!-- <table cellpadding="0" cellspacing="0" border="0" class="display" id="items_table">
+    <thead>
+		<tr>
+            <th>名称</th>
+            <th>样本流量 UB(mil.)</th>
+            <th>UB Dup(mil.)</th>
+            <th>Net UB(mil.)</th>
+            <th>Dup %</th>
+        </tr>
+    </thead>
+    <tbody id='items_table_tbody' >
+        {% for item in items %}
+            <tr>
+			<td>{{ item.c_name }}</td>
+			<td>{{ item.sample_ub }}</td>
+            <td>{{ item.sample_ts }}</td>
+            <td>{{ item.sample_ub_freq }}</td>
+            <td>{{ item.sample_asd}}</td>
+            </tr>
+        {% endfor %} 
+    </tbody>
+	</table> -->
+{% endblock %}
+
+{% block js %}
+<SCRIPT LANGUAGE="JavaScript">
+
+$(document).ready(function(){
+	
+	$("select[id^='id_category']").change(function(){
+		adjustMediaDropdown($(this).attr('id'));
+	});
+	
+	var media_list = new Array();
+
+	function has_element(array, value){
+		var i;
+		for (i=0; i<array.length; i++)
+		{
+			if (array[i] == value)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	$("#button_add_media").click(function(){
+		
+		var base_media = $('#mediadropdown_base').val();
+		var comp_media = $('#mediadropdown_comp').val();
+		if (base_media == null || base_media == '---'){
+			alert("请选择基准媒体");
+			return false;
+		}
+		if (comp_media == null || comp_media == '---'){
+			alert("请选择对比媒体");
+			return false;
+		}
+
+		var value = $('#mediadropdown_comp').val();
+		if (has_element(media_list, value)){
+			alert('已经添加此媒体');
+			return false;
+		}else {
+			media_list.push(value);
+			var caption = $("select[id='mediadropdown_comp'] option[value="+comp_media+"]").text();
+			$('#compmedialist').append(caption+' ');
+		}
+	});
+
+	$("#button_empty_media").click(function(){
+		$('#compmedialist').empty();
+		media_list.length = 0;
+	});
+
+	$.fn.emptySelect = function() {
+		return this.each(function(){
+		if (this.tagName=='SELECT') this.options.length = 0;
+		});
+	}
+
+	$.fn.loadSelect = function(optionsDataArray) {
+		return this.emptySelect().each(function(){
+		if (this.tagName=='SELECT') {
+		var selectElement = this;
+		$.each(optionsDataArray,function(index,optionData){
+			var option = new Option(optionData.caption, optionData.value);
+			if ($.browser.msie) {
+				selectElement.add(option);
+			}else {
+				selectElement.add(option,null);
+			}
+			});
+			}
+		});
+		}
+
+	$("#button_chart").click(function(){
+		base_media = $('#mediadropdown_base').val();
+		path = location.pathname.split('/');
+		path[path.length-2] = 'get_overlap_data';
+		table_data =  new Array();
+		week = $("#id_week").attr("value");
+
+		$.getJSON(path.join('/'), {base_media: base_media, 'comp_media':media_list.toString(), week: week}, function(data){
+			
+			$('.top').remove();
+			$('#items_table_paginate').remove();
+			$('.dataTables_paginate').remove();
+			for (i=0; i<data.overlap.length; i++)
+			{
+				table_data[i] = new Array();
+				table_data[i].push(data.overlap[i].c_name, data.overlap[i].sample_ub, data.overlap[i].net_ub, data.overlap[i].ub_dup, data.overlap[i].dup);
+			}
+			$("#p_base_media").empty();
+			$("#p_base_media").append("<p>基准媒体</p><table cellpadding='0' cellspacing='0' border='0' class='display'><tr><td>名称</td><td>样本流量 UB(mil.) </td><td>样本流量 TS(mil.)</td><td>样本流量 UB Freq</td><td>样本流量 ASD(s)</td></tr><tr><td>"+data.media_c_name+"</td><td>"+ data.sample_ub +"</td><td>"+data.sample_ub_freq+"</td><td>"+ data.sample_ts +"</td><td>"+data.sample_asd+"</td></tr></table><hr><p>对比媒体</p>");
+
+			items_table = $("#items_table").dataTable({      		
+					'aaData': table_data,
+
+					"aoColumns": [
+						{ "sTitle": "名称" , "sWidth": "10%"},
+						{ "sTitle": "样本流量 UB(mil.)" , "sWidth": "20%"},
+						{ "sTitle": "UB Dup(mil.)" , "sWidth": "20%"},
+						{ "sTitle": "Net UB(mil.)" , "sWidth": "20%"},
+						{ "sTitle": "Dup %" , "sWidth": "20%"}
+					],
+            		"sDom": '<"top"if>ptrp'
+            	});
+		});
+	});
+	});
+
+	function adjustMediaDropdown(select_id){
+		var category = $('#'+select_id).val();
+		var media_dropdown;
+		if (select_id == 'id_category_base'){
+			media_dropdown = $('#mediadropdown_base');
+		}else if (select_id == 'id_category_comp'){
+			media_dropdown = $('#mediadropdown_comp');
+		}
+		if (category.length == 0){
+			media_dropdown.attr("disabled", true);
+			$(media_dropdown).emptySelect();
+		}else{
+			media_dropdown.attr("disabled", false);
+			path = location.pathname.split('/');
+			path[path.length-2] = 'get_media_options'
+			$.getJSON(path.join('/'), {category:category}, function(data){
+				media_dropdown.loadSelect(data);
+			});
+		}}
+	
+</SCRIPT>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "ad_resource_mgmt/mp_base.html" %}
+{% block rightpanel %}
+    <div id="right"><h2>增加版主页面</h2>
+        {{ moderator_form.errors }}
+        <form action="{% url add_moderator %}" method="post">
+            <table>
+                <tr>
+                    <td>行业类型: </td>
+                    <td>{{ moderator_form.industry_type }}</td>
+                </tr>
+                <tr>
+                    <td>BBS类型: </td>
+                    <td>{{ moderator_form.bbs_type }}</td>
+                </tr>
+                <tr>
+                    <td>媒体名称: </td>
+                    <td>{{ moderator_form.media_name }}</td>
+                </tr>
+                <tr>
+                    <td>频道: </td>
+                    <td>{{ moderator_form.channel }}</td>
+                </tr>
+                <tr>
+                    <td>BBS版块: </td>
+                    <td>{{ moderator_form.bbs_block }}</td>
+                </tr>
+                <tr>
+                    <td>BBS链接: </td>
+                    <td>{{ moderator_form.bbs_link }}</td>
+                </tr>
+                <tr>
+                    <td>Alexa排名: </td>
+                    <td>{{ moderator_form.alexa_ranking }}</td>
+                </tr>
+                <tr>
+                    <td>版块优势: </td>
+                    <td>{{ moderator_form.block_advantage }}</td>
+                </tr>
+                <tr>
+                    <td>版主ID: </td>
+                    <td>{{ moderator_form.moderator_id }}</td>
+                </tr>
+                <tr>
+                    <td>真实姓名: </td>
+                    <td>{{ moderator_form.name }}</td>
+                </tr>
+                <tr>
+                    <td>手机: </td>
+                    <td>{{ moderator_form.mobile_number }}</td>
+                </tr>
+                <tr>
+                    <td>邮箱: </td>
+                    <td>{{ moderator_form.email }}</td>
+                </tr>
+                <tr>
+                    <td>qq: </td>
+                    <td>{{ moderator_form.qq }}</td>
+                </tr>
+                 <tr>
+                    <td>msn: </td>
+                    <td>{{ moderator_form.msn }}</td>
+                </tr>
+                <tr>
+                    <td>合作评价: </td>
+                    <td>{{ moderator_form.cooperate_evaluation }}</td>
+                </tr>
+                <tr>
+                    <td>其他: </td>
+                    <td>{{ moderator_form.other_info }}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><input type="submit" value="增加"/></td>
+                </tr>
+            </table>
+        </form>
+    </div>
+{% endblock %}

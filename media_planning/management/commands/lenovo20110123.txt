@@ -1,0 +1,3 @@
+# Generic Ad Server template file (user: 63978 ds_id: 2) 
+#       Tracking Code 
+Date	Tracking Code	Event 21

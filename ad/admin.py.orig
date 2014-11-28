@@ -1,0 +1,14 @@
+from MediaChooser.ad.models import AdType
+
+from django.contrib import admin
+
+class AdTypeAdmin(admin.ModelAdmin):
+    save_on_top = True
+    search_fields = ['desc', 'c_name', 'e_name', 'advantage', 'disadvantage']
+
+#class MediaAdInfoAdmin(admin.ModelAdmin):
+ #   save_on_top = True
+  #  search_fields = ['adsize', 'adformat']
+
+admin.site.register(AdType, AdTypeAdmin)
+#admin.site.register(MediaAdInfo, MediaAdInfoAdmin)

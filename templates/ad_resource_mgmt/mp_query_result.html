@@ -1,0 +1,66 @@
+{% extends "ad_resource_mgmt/mp_base.html" %}
+
+{% block rightpanel %}
+
+<h3 class="title">排期查询结果</h3>
+
+	<form action="" method="post">
+		{% csrf_token %}
+		<table>
+			<tr><td width="450px">排期</td><td width="100px">开始日期</td><td width="100px">结束日期</td>
+			<td width="50px">上传者</td></tr>
+		{% for c in campaigns %}
+			<tr class="indent2 f_mc1">
+				<td>
+					<INPUT TYPE="checkbox" NAME="{{ c.name }}" id="{{ c.DE_campaign_id }}" value="{{ c.DE_campaign_id }}"><a href="{% url get_campaign campaign_id=c.DE_campaign_id %}">{{ c.name }}</a></input>
+				</td>
+				<td>
+					{{ c.start_day }}
+				</td>
+				<td>
+					{{ c.end_day }}
+				</td>
+				<td>
+					{{ c.uploader.last_name }}{{ c.uploader.first_name }}
+				</td>
+			</tr>
+		{% empty %}
+			<p>没有找到排期。</p>
+		{% endfor %}
+		</table>
+
+		<p class="indent2">
+			<input id="mflights" type="submit" onClick="this.form.action='../mflights/?source=mflights'" value="多排期比较"></input>
+			<input id="date" type="submit" onClick="this.form.action='../mflights/?source=date'" value="时间趋势"></input>
+			<input id="media" type="submit" onClick="this.form.action='../mflights/?source=media'" value="媒体效果"></input>
+		</p>
+	</form>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+	$(document).ready(function(){
+
+		var checkboxes = new Array();		
+		
+		function get_boxes(){
+			$(":checkbox").each(function(){
+				if ( this.checked == true){
+					checkboxes.push(this.id);
+				}
+			});
+		};
+		
+		$(":submit").click(function(){
+			get_boxes();
+			if (checkboxes.length == 0)
+			{
+				alert("没有选择任何排期");
+				return false;
+			}
+			this.form.action = '../mflights/?source=' + this.id + '&data=' + checkboxes.toString();
+		});
+
+	});
+</script>
+{% endblock %}

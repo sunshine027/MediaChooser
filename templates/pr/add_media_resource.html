@@ -1,0 +1,114 @@
+{% extends "ad_resource_mgmt/mp_base.html" %}
+{% block rightpanel %}
+    <div id="right"><h2>增加媒体资源页面</h2>
+        <!-- {{ media_resource_form.errors }} -->
+        <form action="{% url add_media_resource %}" method="post">
+            <table>
+                <tr>
+                    <td>省份: </td>
+                    <td>{{ media_resource_form.province }}</td>
+                </tr>
+                <tr>
+                    <td>城市: </td>
+                    <td>{{ media_resource_form.city }}</td>
+                </tr>
+                <tr>
+                    <td>媒体名称: </td>
+                    <td>{{ media_resource_form.media_name }}</td>
+                </tr>
+                <tr>
+                    <td>媒体类型: </td>
+                    <td>{{ media_resource_form.media_type }}</td>
+                </tr>
+                <tr>
+                    <td>一级分类: </td>
+                    <td>{{ media_resource_form.first_category }}</td>
+                </tr>
+                <tr>
+                    <td>二级分类: </td>
+                    <td>{{ media_resource_form.second_category  }}</td>
+                </tr>
+                <tr>
+                    <td>媒体级别: </td>
+                    <td>{{ media_resource_form.media_level }}</td>
+                </tr>
+                <tr>
+                    <td>网址: </td>
+                    <td>{{ media_resource_form.url }}</td>
+                </tr>
+                <tr>
+                    <td>排名: </td>
+                    <td>{{ media_resource_form.ranking }}</td>
+                </tr>
+                <tr>
+                    <td>访问量: </td>
+                    <td>{{ media_resource_form.visits }}</td>
+                </tr>
+                <tr>
+                    <td>主管单位: </td>
+                    <td>{{ media_resource_form.domain_company }}</td>
+                </tr>
+                <tr>
+                    <td>办公地址: </td>
+                    <td>{{ media_resource_form.office_address }}</td>
+                </tr>
+                <tr>
+                    <td>媒体定位: </td>
+                    <td>{{ media_resource_form.media_location }}</td>
+                </tr>
+                <tr>
+                    <td>版面构成及特点: </td>
+                    <td>{{ media_resource_form.page_compose_feature }}</td>
+                </tr>
+                <tr>
+                    <td>受众构成: </td>
+                    <td>{{ media_resource_form.accepter_compose }}</td>
+                </tr>
+                <tr>
+                    <td>受众年龄段: </td>
+                    <td>{{ media_resource_form.accepter_age_bracket }}</td>
+                </tr>
+                <tr>
+                    <td>受众浏览爱好: </td>
+                    <td>{{ media_resource_form.accepter_hobbies }}</td>
+                </tr>
+                 <tr>
+                    <td>受众价值取向: </td>
+                    <td>{{ media_resource_form.accepter_value_orientation }}</td>
+                </tr>
+                <tr>
+                    <td>受众男女比例: </td>
+                    <td>{{ media_resource_form.accepter_proportion }}</td>
+                </tr>
+                <tr>
+                    <td>成立日: </td>
+                    <td>{{ media_resource_form.found_day }} 例如：2009-01-01 <br>
+                        {{ media_resource_form.found_day.errors }}</td>
+                </tr>
+                <tr>
+                    <td>公关稿件要求: </td>
+                    <td>{{ media_resource_form.pr_contribution_require }}</td>
+                </tr>
+                <tr>
+                    <td>网站管理体制: </td>
+                    <td>{{ media_resource_form.website_management }}</td>
+                </tr>
+                <tr>
+                    <td>上线流程: </td>
+                    <td>{{ media_resource_form.rollout_flow }}</td>
+                </tr>
+                <tr>
+                    <td>简介: </td>
+                    <td>{{ media_resource_form.introduction }}</td>
+                </tr>
+                <tr>
+                    <td>备注: </td>
+                    <td>{{ media_resource_form.remark }}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><input type="submit" value="增加"/></td>
+                </tr>
+            </table>
+        </form>
+    </div>
+{% endblock %}

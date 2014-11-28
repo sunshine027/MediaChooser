@@ -1,0 +1,162 @@
+{% extends "ad_resource_mgmt/mp_base.html" %}
+
+{% block rightpanel %}
+
+
+{% for k, v in media_tree.items %}
+<div id="media_tree">
+<p><input id="{{k}}" class="media_box" type="checkbox">{{ k }}</input><input class="mediabutton" type="button" value="+"></input></p>
+	{% for kk, vv in v.items %}
+		<p class="channel">----<input id="{{kk}}" class="channel_box" type="checkbox">{{kk}}</input><input class="channelbutton" type="button" value="+"></input></p>
+			{% for vvv in vv %}
+				<p class="flight">--------<input id="{{vvv}}" class="flight_box" type="checkbox">{{vvv}}</input></p>
+			{% endfor %}
+	{% endfor %}
+</div>
+{% endfor %}
+
+<input id="submitmedia" type="button" value="查看媒体效果比较"></input>
+
+<p>
+	&nbsp;
+</p>
+
+<!-- <div id="jshere"> </div> -->
+<p><div id='cpc_media_chart'></div></p>
+
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="/files_dl/swfobject.js"></script>
+<script type="text/javascript" src="/files_dl/json2.js"></script>
+<script type="text/javascript">
+	swfobject.embedSWF("/files_dl/open-flash-chart.swf", "cpc_media_chart", "700", "300", "9.0.0");
+</script>
+
+<script type="text/javascript">
+	
+	init_data = {{ init_data|safe }}
+
+	function ofc_ready(){
+	}
+	
+	function open_flash_chart_data(){
+			return JSON.stringify(init_data);
+		}
+	
+	function findSWF(movieName){
+  		if (navigator.appName.indexOf("Microsoft")!= -1) {
+			return window[movieName];} 
+		else {
+			return document[movieName];
+			}
+	}
+
+	function load_chart(data){
+		tmp = findSWF("cpc_media_chart");
+		x = tmp.load(JSON.stringify(data));
+	}
+		
+	$(document).ready(function(){
+		
+		$("#cpc_media_chart").hide();
+		
+		$("#media_tree .channel").each(function(){
+			$(this).hide();
+		});
+		
+		$("#media_tree .flight").each(function(){
+			$(this).hide();
+		});
+		
+		$("#media_tree .mediabutton").toggle(
+			function() {
+				$(this).attr('value', '-');
+				$(this).parent().parent().find('.channel').each(function(){
+				$(this).show();				
+			})
+			;},
+			
+			function() {
+				$(this).attr('value', '+');
+				target = $(this).parent().parent()
+				target.find('.channelbutton').attr('value', '+')
+				target.find('.channel').each(function(){
+					$(this).hide();})
+				target.find('.flight').each(function(){
+					$(this).hide();})
+			;}
+		);
+
+		$("#media_tree .channelbutton").toggle(
+			function() {
+				$(this).attr('value', '-');
+				$(this).parent().parent().find('.flight').each(function(){
+				$(this).show();		
+			})
+			;},
+			
+			function() {
+				$(this).attr('value', '+');
+				$(this).parent().parent().find('.flight').each(function(){
+				$(this).hide();
+			})
+			;}
+		);
+		
+		
+
+		var media_list = new Array();
+		var channel_list = new Array();
+		var flight_list = new Array();
+
+		function get_boxes(){
+			media_list.length = 0;
+			channel_list.length = 0;
+			flight_list.length = 0;
+
+			$("#media_tree .media_box").each(function(){
+				if ( this.checked == true){
+					media_list.push(this.id);
+				}
+			});
+			
+			$("#media_tree .channel_box").each(function(){
+				if ( this.checked == true){
+					channel_list.push(this.id);
+				}
+			});
+
+			$("#media_tree .flight_box").each(function(){
+				if ( this.checked == true){
+					flight_list.push(this.id);
+				}
+			});
+		};
+		
+		$("#submitmedia").click(function(){
+			get_boxes();
+			path = location.pathname.split('/');
+			path[path.length-2] = 'query_media';
+			//$("#jshere").empty();
+			//$("#jshere").append("<script type='text/javascript'>swfobject.embedSWF('/files_dl/open-flash-chart.swf', //'cpc_media_chart', '700', '300', '9.0.0');<\/script><p><div id='cpc_media_chart'></div></p>");
+			$.getJSON(path.join('/'), {campaign_id:{{campaign_id}}.toString(), media_list:media_list.toString(), flight_list:flight_list.toString(),channel_list:channel_list.toString()}, function(data){
+				load_chart(data);
+			});
+		});
+
+		$(":submit").click(function(){
+			url = '../mflights/?source=' + this.id + '&data=';
+			{% for d in campaign_id %}
+				{% if forloop.last %}
+					url += {{d}}
+				{% else %}
+					url += {{d}} + ','
+				{% endif %}
+			{% endfor %}
+			this.form.action = url;
+		});
+
+	});
+</script>
+{% endblock %}

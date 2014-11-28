@@ -1,0 +1,75 @@
+{% extends "ad_resource_mgmt/mp_base.html" %}
+
+{% block sectionid %}mp_upload{% endblock %}
+
+{% block rightpanel %}
+
+    <div>
+      <h2>上传排期</h2>
+      <div id="div_upload">
+	<form id="form_mp_upload" method="POST" action="" enctype="multipart/form-data">
+		{% csrf_token %}
+	  <p><label for="id_client">广告主: </label>
+	    <select id="id_client" name="client">
+	      <option value="" selected="selected">------</option>
+	      {% for client in clients %}
+	      <option value="{{ client.id }}">{{ client.c_name }}</option>
+	      {% endfor %}
+            </select>
+	  </p>
+	  <p><label for="id_activity_type">活动类型: </label>
+	    <select id="id_activity_type" name="activity_type">
+	      <option value="" selected="selected">------</option>
+	      {% for type in activity_types %}
+	      <option value="{{ type.id }}">{{ type.name }}</option>
+	      {% endfor %}
+	    </select>
+	  </p>
+	  <p><label for="id_file_upload">上传排期: </label><input type="file" id="id_file_upload" name="file_upload" /></p>
+	  <p><label for="id_campaign">排期ID：</label><input type="text" id="id_campaign" name="campaign" /></p>
+	  <p><label for="id_related_staff">相关负责人: </label>
+	    <select id="id_related_staff" name="related_staff" multiple="multiple" size="6">
+	      {% for st in staff %}
+	      <option value="{{ st.id  }}">{% if st.last_name %}{{ st.last_name }}{{ st.first_name }}{% else %}{{ st.username }}{% endif %}</option>
+	      {% endfor %}
+	    </select>
+	  </p>
+	  <p><button type="submit">上传</button></p>
+	</form>
+	{% if ret.ret %}<p>返回信息: {{ ret.msg }}</p>
+	{% else %}<p>返回信息: <span style="color:red; font-weight:bold;">{{ ret.msg }}</span></p>
+	{% endif %}
+      </div>
+      <div id="div_recent_uploaded">
+	  <h3>最近一周上传排期</h3>
+	  <ul>
+	  {% for ad in recent_uploaded %}
+	  <li> <a href="{% url get_campaign ad.DE_campaign_id %}" title="{{ ad.name }}" >{{ ad.name }}</a> <br /> {{ ad.create_time|date:"Y/m/d H:i" }} by
+	    {% if ad.uploader.last_name %}{{ ad.uploader.last_name }}{{ ad.uploader.first_name }}{% else %}{{ ad.uploader.username}}{% endif %}</li>
+	  {% endfor %}
+	  </ul>
+      </div>
+	
+    </div>
+
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+$(document).ready(function() {
+  $("#form_mp_upload").validate({
+    rules: {
+      client: "required",
+      activity_type: "required",
+      mp: {required: true, number: true},
+      file_up: "required",
+      campaign: {required: true, number: true},
+      related_staff: "required"
+    },
+    messages: {}
+  });
+});
+
+
+</script>
+{% endblock %}

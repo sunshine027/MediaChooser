@@ -1,0 +1,598 @@
+
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<html>
+
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<base target="_top">
+<style type="text/css">
+  
+
+/* default css */
+
+table {
+  font-size: 1em;
+  line-height: inherit;
+  border-collapse: collapse;
+}
+
+
+tr {
+  
+  text-align: left;
+  
+}
+
+
+div, address, ol, ul, li, option, select {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+p {
+  margin: 0px;
+}
+
+
+pre {
+  font-family: Courier New;
+  white-space: pre-wrap;
+  margin:0;
+}
+
+body {
+  margin: 6px;
+  padding: 0px;
+  font-family: Verdana, sans-serif;
+  font-size: 10pt;
+  background-color: #ffffff;
+  color: #000;
+}
+
+
+img {
+  -moz-force-broken-image-icon: 1;
+}
+
+@media screen {
+  html.pageview {
+    background-color: #f3f3f3 !important;
+    overflow-x: hidden;
+    overflow-y: scroll;
+  }
+
+  
+
+  body {
+    min-height: 1100px;
+    
+    counter-reset: __goog_page__;
+  }
+  
+  * html body {
+    height: 1100px;
+  }
+  /* Prevent repaint errors when scrolling in Safari. This "Star-7" css hack
+     targets Safari 3.1, but not WebKit nightlies and presumably Safari 4.
+     That's OK because this bug is fixed in WebKit nightlies/Safari 4 :-). */
+  html*#wys_frame::before {
+    content: '\A0';
+    position: fixed;
+    overflow: hidden;
+    width: 0;
+    height: 0;
+    top: 0;
+    left: 0;
+  }
+  
+  .pageview body {
+    border-top: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+    border-right: 2px solid #bbb;
+    border-bottom: 2px solid #bbb;
+    width: 648px !important;
+    margin: 15px auto 25px;
+    padding: 40px 50px;
+  }
+  /* IE6 */
+  * html {
+    overflow-y: scroll;
+  }
+  * html.pageview body {
+    overflow-x: auto;
+  }
+  
+
+  
+    
+    
+    .writely-callout-data {
+      display: inline-block;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      margin-left: -1px;
+    }
+    
+
+    .writely-footnote-marker {
+      background-image: url('MISSING');
+      background-color: transparent;
+      background-repeat: no-repeat;
+      width: 7px;
+      overflow: hidden;
+      height: 16px;
+      vertical-align: top;
+
+      
+      -moz-user-select: none;
+    }
+    .editor .writely-footnote-marker {
+      cursor: move;
+    }
+    .writely-footnote-marker-highlight {
+      background-position: -15px 0;
+      -moz-user-select: text;
+    }
+    .writely-footnote-hide-selection ::-moz-selection, .writely-footnote-hide-selection::-moz-selection {
+      background: transparent;
+    }
+    .writely-footnote-hide-selection ::selection, .writely-footnote-hide-selection::selection {
+      background: transparent;
+    }
+    .writely-footnote-hide-selection {
+      cursor: move;
+    }
+
+    /* Comments */
+    .writely-comment-yellow {
+      background-color: #ffffd7;
+    }
+    .writely-comment-orange {
+      background-color: #ffe3c0;
+    }
+    .writely-comment-pink {
+      background-color: #ffd7ff;
+    }
+    .writely-comment-green {
+      background-color: #d7ffd7;
+    }
+    .writely-comment-blue {
+      background-color: #d7ffff;
+    }
+    .writely-comment-purple {
+      background-color: #eed7ff;
+    }
+
+  
+
+
+  
+  .br_fix span+br:not(:-moz-last-node) {
+    
+    position:relative;
+    
+    left: -1ex
+    
+  }
+
+  
+  #cb-p-tgt {
+    font-size: 8pt;
+    padding: .4em;
+    background-color: #ddd;
+    color: #333;
+  }
+  #cb-p-tgt-can {
+    text-decoration: underline;
+    color: #36c;
+    font-weight: bold;
+    margin-left: 2em;
+  }
+  #cb-p-tgt .spin {
+    width: 16px;
+    height: 16px;
+    background: url(//ssl.gstatic.com/docs/clipboard/spin_16o.gif) no-repeat;
+  }
+}
+
+h6 { font-size: 8pt }
+h5 { font-size: 8pt }
+h4 { font-size: 10pt }
+h3 { font-size: 12pt }
+h2 { font-size: 14pt }
+h1 { font-size: 18pt }
+
+blockquote {padding: 10px; border: 1px #DDD dashed }
+
+.webkit-indent-blockquote { border: none; }
+
+a img {border: 0}
+
+.pb {
+  border-width: 0;
+  page-break-after: always;
+  /* We don't want this to be resizeable, so enforce a width and height
+     using !important */
+  height: 1px !important;
+  width: 100% !important;
+}
+
+.editor .pb {
+  border-top: 1px dashed #C0C0C0;
+  border-bottom: 1px dashed #C0C0C0;
+}
+
+div.google_header, div.google_footer {
+  position: relative;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+
+/* Table of contents */
+.editor div.writely-toc {
+  background-color: #f3f3f3;
+  border: 1px solid #ccc;
+}
+.writely-toc > ol {
+  padding-left: 3em;
+  font-weight: bold;
+}
+ol.writely-toc-subheading {
+  padding-left: 1em;
+  font-weight: normal;
+}
+/* IE6 only */
+* html writely-toc ol {
+  list-style-position: inside;
+}
+.writely-toc-none {
+  list-style-type: none;
+}
+.writely-toc-decimal {
+  list-style-type: decimal;
+}
+.writely-toc-upper-alpha {
+  list-style-type: upper-alpha;
+}
+.writely-toc-lower-alpha {
+  list-style-type: lower-alpha;
+}
+.writely-toc-upper-roman {
+  list-style-type: upper-roman;
+}
+.writely-toc-lower-roman {
+  list-style-type: lower-roman;
+}
+.writely-toc-disc {
+  list-style-type: disc;
+}
+
+/* Ordered lists converted to numbered lists can preserve ordered types, and
+   vice versa. This is confusing, so disallow it */
+ul[type="i"], ul[type="I"], ul[type="1"], ul[type="a"], ul[type="A"] {
+  list-style-type: disc;
+}
+
+ol[type="disc"], ol[type="circle"], ol[type="square"] {
+  list-style-type: decimal;
+}
+
+/* end default css */
+
+
+  /* default print css */
+  @media print {
+    body {
+      padding: 0;
+      margin: 0;
+    }
+
+    div.google_header, div.google_footer {
+      display: block;
+      min-height: 0;
+      border: none;
+    }
+
+    div.google_header {
+      flow: static(header);
+    }
+
+    /* used to insert page numbers */
+    div.google_header::before, div.google_footer::before {
+      position: absolute;
+      top: 0;
+    }
+
+    div.google_footer {
+      flow: static(footer);
+    }
+
+    /* always consider this element at the start of the doc */
+    div#google_footer {
+      flow: static(footer, start);
+    }
+
+    span.google_pagenumber {
+      content: counter(page);
+    }
+
+    span.google_pagecount {
+      content: counter(pages);
+    }
+
+    .endnotes {
+      page: endnote;
+    }
+
+    /* MLA specifies that endnotes title should be 1" margin from the top of the page. */
+    @page endnote {
+      margin-top: 1in;
+    }
+
+    callout.google_footnote {
+      
+      display: prince-footnote;
+      footnote-style-position: inside;
+      /* These styles keep the footnote from taking on the style of the text
+         surrounding the footnote marker. They can be overridden in the
+         document CSS. */
+      color: #000;
+      font-family: Verdana;
+      font-size: 10.0pt;
+      font-weight: normal;
+    }
+
+    /* Table of contents */
+    #WritelyTableOfContents a::after {
+      content: leader('.') target-counter(attr(href), page);
+    }
+
+    #WritelyTableOfContents a {
+      text-decoration: none;
+      color: black;
+    }
+
+    /* Comments */
+    .writely-comment-yellow {
+      background-color: #ffffd7;
+    }
+    .writely-comment-orange {
+      background-color: #ffe3c0;
+    }
+    .writely-comment-pink {
+      background-color: #ffd7ff;
+    }
+    .writely-comment-green {
+      background-color: #d7ffd7;
+    }
+    .writely-comment-blue {
+      background-color: #d7ffff;
+    }
+    .writely-comment-purple {
+      background-color: #eed7ff;
+    }
+  }
+
+  @page {
+    @top {
+      content: flow(header);
+    }
+    @bottom {
+      content: flow(footer);
+    }
+    @footnotes {
+      border-top: solid black thin;
+      padding-top: 8pt;
+    }
+  }
+  /* end default print css */
+
+
+/* custom css */
+
+
+/* end custom css */
+
+/* ui edited css */
+
+body {
+  font-family: Verdana;
+  
+  font-size: 10.0pt;
+  line-height: normal;
+  background-color: #ffffff;
+}
+/* end ui edited css */
+
+
+/* editor CSS */
+.editor a:visited {color: #551A8B}
+.editor table.zeroBorder {border: 1px dotted gray}
+.editor table.zeroBorder td {border: 1px dotted gray}
+.editor table.zeroBorder th {border: 1px dotted gray}
+
+
+.editor div.google_header, .editor div.google_footer {
+  border: 2px #DDDDDD dashed;
+  position: static;
+  width: 100%;
+  min-height: 2em;
+}
+
+.editor .misspell {background-color: yellow}
+
+.editor .writely-comment {
+  font-size: 9pt;
+  line-height: 1.4;
+  padding: 1px;
+  border: 1px dashed #C0C0C0
+}
+
+
+/* end editor CSS */
+
+</style>
+
+  
+  <title>MediaChooser 使用手册</title>
+
+</head>
+
+<body 
+    
+    >
+    
+    
+    
+<h1>
+  MediaChooser<sup>®</sup>使用手册
+</h1>
+MediaChooser<sup>®</sup>是由电众数码(北京)广告有限公司开发的新一代数字媒体决策系统。<br>
+<h2>
+  一、系统登录
+</h2>
+1 MediaChooser 访问地址：&nbsp; <b style=COLOR:#0000ff>http://mc.and-c.com/mediachooser/</b><br>
+<br>
+2 推荐windows用户使用<b style=COLOR:#0000ff>FireFox</b>或者谷歌的<b style=COLOR:#0000ff>Chrome</b>等高级浏览器,苹果用户可选择使用<b>Safari</b>,&nbsp; <b><font color=#0000ff>不支持</font></b>IE以及世界之窗、腾讯浏览器、maxthon、360浏览器等基于IE内核的浏览器。<br>
+<br>
+下载地址：<br>
+FireFox&nbsp; http://www.mozilla.com<br>
+Chrome&nbsp; http://www.google.com/chrome?hl=zh-CN<br>
+<br>
+<div>
+  装好了之后必须<font color=#0000ff><b>安装</b></font><font color=#0000ff><b>flash player</b></font>才能看到图表,安装方式是打开firefox或safari，随便打开一个有flash的网站，如www.sina.com.cn，页面提示没有装flash，跟随提示进行安装即可。<br>
+  <br>
+  3 MediaChooser 系统已经为媒介部每位同事初始化了账户，登录名和密码均为自己姓名的<b style=COLOR:#0000ff>汉语拼音</b>，登录进入系统后可以修改密码。<b><font color=#0000ff>其它部门的同事暂时不开放账号</font></b>。<br>
+  &nbsp;&nbsp; PS：<font color=#cc0000 size=3><b>请大家第一次登录后修改自己的密码，谨防出现账号被他人使用造成不良后果！</b></font><br>
+  <br>
+  <h2>
+    二、系统使用
+  </h2>
+  MediaChooser系统主要分为四个模块：<br>
+  <h4>
+    1 广告效果查询
+  </h4>
+  <div>
+    &nbsp; 对以往投放的排期效果进行查询。有两种查询方式：<br>
+    &nbsp; 1、直接查询。输入排期ID直接查看排期效果。<br>
+    &nbsp; 2、过滤查询。通过选择广告主、排期名字、排期开始日期、结束日期进行过滤查询。如果什么都不选直接查询，则可以看到所有排期。<br>
+    <br>
+    &nbsp; 点击查询后，将进入单排期效果显示页面：<br>
+    &nbsp; 页面以表格和图表的形式显示了此排期的相关信息。从上至下四幅图分别表示了此排期的每日cpc\click走势图，媒体的cpc\click对比图、媒体投放量对比图以及媒体媒体的cpc走势图。<br>
+    <br>
+    &nbsp; <b style=COLOR:#0000ff>修改排期名</b>：点击排期名旁边的“修改”按钮，可以修改排期名字。<br>
+    <h4>
+      2 媒体效果分析
+    </h4>
+    &nbsp; 从媒体类别、媒体、频道、广告位 四个角度展示媒体广告投放效果。使用方法：<br>
+    <br>
+    &nbsp; 1、选择客户。<br>
+    &nbsp; &nbsp; &nbsp; 点击“选择客户”可选择单个客户，也可选择某个行业的所有客户。如果什么都不选，则系统默认为全选。<br>
+    &nbsp;<br>
+    &nbsp; 2、选择时间段。<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 选择需要查询的开始时间和结束时间，选定之后，所有落在此时间段之内的排期将被选中用于计算结果。如果不选，则默认为所有时间段。<br>
+    &nbsp;<br>
+    &nbsp; 3、选择比较对象。<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 点击“确定”按钮，在下面的选择框中将按照媒体大类、子类、媒体、频道、广告位的顺序排列，点击其中任何一项、单击添加，则可以将其添加到待比较的列表中。<br>
+    <br>
+    &nbsp; 4、开始比较。<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 单击“开始比较”按钮。系统将待比较列表中的所有对象的cpc结果进行比较，以图表的形式展现在下方。<br>
+    <h4>
+      3 媒体推荐
+    </h4>
+    &nbsp;&nbsp;&nbsp; 在此模块中，系统自动根据用户选择的比较指标和过滤条件对历史数据进行计算，推荐最合适的媒体\频道\广告位<br>
+    <br>
+    &nbsp;&nbsp;&nbsp; 1、选择指标和返回的推荐结果数目。<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 目前<b><font color=#0000ff>只支持CPC</font></b>，其他选项无效。<br>
+    &nbsp;<br>
+    &nbsp;&nbsp;&nbsp; 2、选择客户<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 用法同上<br>
+    <br>
+    &nbsp;&nbsp;&nbsp; 3、选择时间段<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 用法同上<br>
+    <br>
+    &nbsp;&nbsp;&nbsp; 4、选择查看级别<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 可以选择从媒体的角度来生成推荐结果、或者是直接推荐频道。默认为媒体。<br>
+    <br>
+    &nbsp;&nbsp;&nbsp; 5、选择媒体类别<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 此选项将对推荐的媒体进行过滤，选择类别后，系统将只推荐属于此类别下的媒体和频道。<br>
+    <br>
+    &nbsp;&nbsp;&nbsp; 6、点击“推荐查询”<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 点击后，系统会根据前5个步骤设置的条件，给出推荐的结果。其中每个柱状图都可以继续点击，比如在生成的推荐媒体中，单击柱状图可以显示该媒体下面的所有频道、继续单击可以看到该频道下面的所有广告位。<br>
+    <br>
+    <h4>
+      4 排期导入
+    </h4>
+    &nbsp;&nbsp;&nbsp; 用于排期的上传，上传之后，系统会自动进行处理，将其中的数据导入数据库。如果有错误提示，请根据提示修改后再上传。<br>
+    <br>
+    &nbsp;&nbsp;&nbsp; 注意在上传的时候选择相应的<b style=COLOR:#0000ff>客户</b>，如果没有找到对应的客户，请联系有添加权限的同事(郭建峰)添加客户。<br>
+    &nbsp;&nbsp;&nbsp; 同时、务必请选择排期相关的<b style=COLOR:#0000ff>负责人</b>(可多选)，在某些情况下，由于doubleclick的代码没有加好或是其他原因、导致doubleclick没有监测到点击数据，这时系统会向这些人发邮件通知。<br>
+    <br>
+    &nbsp;&nbsp;&nbsp; 注意事项：<br>
+    <ul>
+      <li>
+        <b>对于2007格式的Excel文档，暂时无法导入，请手动转换成2003格式后再上传</b><br>
+      </li>
+      <li>
+        上传的文件里必须只涉及一单排期的内容；目前上传程序只处理每个Excel文件的第一个sheet(表单)
+      </li>
+      <li>
+        "广告规格"的长度不要超过128个汉字
+      </li>
+      <li>
+        投放单位必须是天和CPM
+      </li>
+      <li>
+        针对关键字的投放，广告形式必须写"关键字"或者"精准广告"
+      </li>
+      <li>
+        格式问题，排期的表头最好把模板上的COPY过来，确保格式一致，日期的格式要改成对应的日期格式（在设置单元格选项下选择日期改成如2009年9月的格式）
+      </li>
+      <li>
+        在折扣的前面添加一列"购买方式"购买资源下面填"<b>购买</b>"，赠送资源下面填"<b>赠送</b>"
+      </li>
+      <li>
+        请按照"<b><font color=#CC0000>XX客户XX产品XXXX推广（XX年X月X日-XX年X月X日）</font></b>"的格式录入排期的名字
+      </li>
+      <li>
+        <b>为了以后更方便大家的查看，请务必纠正广告位置及形式的错误和重复</b>
+      </li>
+      <li>
+        投放量/单位等不能为空
+      </li>
+    </ul>
+    <br>
+    <br>
+    MediaChooser目前已经到了一个比较稳定的版本，同时我们每天都在做改进、包括UI、UE调整、数据录入及数据校验、图表展示、系统性能优化等等。<br>
+    如有系统使用上的疑问，程序bug、以及建议和意见，请发邮件到董磊(donglei@and-c.com)，抄送陆丹峰(ludanfeng@and-com)<br>
+    <br>
+    <br>
+    附录：<br>
+    <br>
+    <ol>
+      <li>
+        DC排期录入的注意事项：
+      </li>
+      <ul>
+        <li>
+          <b>严禁将不属于同一排期的内容录入到同一个排期中</b>
+        </li>
+        <li>
+          慎用排期录入中的"复制"功能
+        </li>
+        <li>
+          同一排期中不同代码，其各项属性不可以完全相同<br>
+        </li>
+      </ul>
+    </ol>
+  </div>
+  <br>
+</div>
+<br></body>
+</html>

@@ -1,0 +1,91 @@
+{% extends "ad_resource_mgmt/mp_base.html" %}
+{% load filters_extra %}
+{% block rightpanel %}
+    <div id="right"><h2>博主列表页面</h2>
+        <a href="{% url add_blog_owner %}">增加</a><br>
+        <form action="{% url batch_add_blog_owner_by_excel %}" method="post" id="blog_owner_form" enctype="multipart/form-data">
+            上传博主: <input type="file" id="blog_owner_file" name="blog_owner_file">
+            <input type="button" onclick="submitForm()" value="确定"/>
+            {{ ret.msg }}
+        </form>
+        <table>
+            <tr>
+                <td>博客名称</td>
+                <td>博主姓名</td>
+                <td>博主属性</td>
+                <td>内容行业类型</td>
+                <td>博客流量</td>
+                <td>博客链接</td>
+                <td>媒体名称</td>
+                <td>博主写作风格</td>
+                <td>博主手机</td>
+                <td>邮箱</td>
+                <td>QQ</td>
+                <td>MSN</td>
+                <td>撰写时间</td>
+                <td>博主简介</td>
+                <td>合作评价</td>
+                <td>优势</td>
+                <td>其他</td>
+                <td>操作</td>
+            </tr>
+           {% for blog_owner in blog_owner_list%}
+            <tr>
+                <td>{{ blog_owner.blog_name }}</td>
+                <td>{{ blog_owner.name }}</td>
+                <td>{{ blog_owner.attr }}</td>
+                <td>{{ blog_owner.content_industry_type }}</td>
+                <td>{{  blog_owner.blog_flow}}</td>
+                <td>{{  blog_owner.blog_link }}</td>
+                <td>{{  blog_owner.media_name }}</td>
+                <td>{{  blog_owner.writing_style }}</td>
+                <td>{{  blog_owner.mobile }}</td>
+                <td>{{  blog_owner.email }}</td>
+                <td>{{  blog_owner.qq }}</td>
+                <td>{{  blog_owner.msn }}</td>
+                <td>{{  blog_owner.writing_time }}</td>
+                <td>{{  blog_owner.introduction }}</td>
+                <td>{{  blog_owner.cooperate_evaluation }}</td>
+                <td>{{  blog_owner.advantage }}</td>
+                <td>{{  blog_owner.other_info }}</td>
+                <td><a href="{% url edit_blog_owner blog_owner.id %}">编辑</a><a href="{% url delete_blog_owner blog_owner.id %}" onclick="return confirm('确定删除吗?')">删除</a></td>
+            <tr>
+           {% empty %}
+            <tr><td  colspan="18">没有任何数据</td></tr>
+           {% endfor %} 
+           </table>
+    </div>
+{% endblock %}
+{% block js %}
+    <script type="text/javascript" src="/media-{{ request.path|first_subpath }}/js/jquery.form.js"></script>
+    <script type="text/javascript">
+        String.prototype.endWith=function(str){
+            if(str==null||str==""||this.length==0||str.length>this.length)
+              return false;
+            if(this.substring(this.length-str.length)==str)
+              return true;
+            else
+              return false;
+            return true;
+            }
+        function submitForm(){
+            file_path = $('#blog_owner_file').val();
+            if(file_path == ''){
+                alert('上传文件不能为空');                
+            }else if(!file_path.endWith('xls')){
+                alert('请上传.xsl结尾的excel文件');                                                                
+            }else{
+                $('#blog_owner_form').ajaxSubmit(function(data){
+                    if(data != 'succesful'){
+                        alert(data);
+                    }else{
+                        alert('上传成功');
+                       location.reload();   
+                    }                                                
+                });  
+                  
+            }
+                   
+        }
+    </script>
+{% endblock %}

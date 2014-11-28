@@ -1,0 +1,609 @@
+{% extends "ad_resource_mgmt/mp_base.html" %}
+{% load filters_extra %}
+{% block sectionid %}media_effectiveness{% endblock %}
+
+{% block rightpanel %}
+
+<h2>媒体效果分析</h2>
+<div id="div_filter">
+  <h3>选择客户</h3>
+	<button id="choose_client" class="ui-button ui-state-default ui-corner-all indent2">选择客户</button>
+	<div id="clients_filter" style="display:none;z-index:10000;" title="选择客户">
+		{% for k,v in clients_dict.items %}
+			<p><input type="checkbox" class="industrybox" id="{{k}}">{{ k }}</input><br>
+			&nbsp;&nbsp;&nbsp;&nbsp;
+			{% for c in v %}
+				<input type="checkbox" class="clientbox" id="{{c.id}}">{{ c }}&nbsp;
+			{% endfor %}
+			</p>
+		{% endfor %}
+	</div>
+	<h3 title="留空则选择所有时段">选择时间段</h3>
+	<form action="" method="post" class="indent2">
+		{% csrf_token %}
+		<p>{{ form.start_day.errors }}<label for="start_day">开始日期: </label>{{ form.start_day }}</p>
+		<p>{{ form.end_day.errors }}<label for="end_day">结束日期: </label>{{ form.end_day }}</p>
+		<p><button id="button_mediafilter" type="button" class="ui-button ui-state-default ui-corner-all">确定</button></p>
+		<!--<p><input type="submit" id="button_mediafilter" value="确定" /></p>-->
+	</form>
+	
+	<!-- <div id="loading" style="display:none;position:absolute;z-index:10001;left:500px;top:500px;"><img src="/files_dl/loading.gif" /></div> -->
+	<!-- <div id="loading" style="display:none;"><img src="/files_dl/loading.gif" /></div> -->
+	<h3>点击确定开始选择媒体</h3>
+
+	<div id="mediaselect" class="cascading-container">
+			<ol id="J_OlCascadingList" style="left: 0px;">
+				<li id="maincat" class="root">
+					<ul id="maincatul" class="col" style="align:center;">
+						
+					</ul>
+				</li>
+				<li id="subcat" class="root" style="display:none"></li>
+				<li id="mediacat" class="root" style="display:none"></li>
+				<li id="channelcat" class="root" style="display:none"></li>
+				<li id="flightcat" class="root" style="display:none"></li>
+			</ol>
+	</div>
+
+
+
+	<div>
+		<button type="button" class="indent2 ui-button ui-state-default ui-corner-all" id="addselectmedia">添加</button>
+	</div>
+	
+	<div>
+		<table id="selectlist">
+			<tr><th>分类</th><th>子分类</th><th>媒体</th><th>频道</th><th>广告位</th><th>操作</th></tr>
+		</table>
+		<button class="indent2 ui-button ui-state-default ui-corner-all" id="compmedia" type="button">开始比较</button>
+		
+<!-- 		<div id="loading1" style="display:none;"><img src="/files_dl/loading.gif" /></div> -->
+
+	</div>
+
+	<div>
+		<p>&nbsp;</p>
+	</div>
+
+	<div id="media_tree">
+		
+	</div>
+	
+	<div id="amchart">
+		
+	</div>
+    <div class="info">
+        <div id="amfusionchart">
+            
+        </div>
+        <div id="fcexpDiv" align="center">FusionCharts Export Handler Component</div>
+    </div>
+<!--	
+	<div id="chart">
+	</div>
+
+	<div class="indent2">
+	<input type="radio" name="sorted" value=0 checked><span class="f_mc1">从小到大</span></input>
+	<input type="radio" name="sorted" value=1><span class="f_mc1">从大到小</span></input>
+	<button class="ui-button ui-state-default ui-corner-all" id="linechartbutton" type="button">线状图</button>
+	<button class="ui-button ui-state-default ui-corner-all" id="barchartbutton" type="button">柱状图</button>
+	<button class="ui-button ui-state-default ui-corner-all" id="saveimage" onclick="javascript:save_image()" type="button">保存为图片</button>
+	<input id="exportxls" type="button" value="导出excel文件" />
+	</div>
+	-->
+</div>
+{% endblock %}
+
+
+{% block js %}
+<script type="text/javascript" src="/media-{{ request.path|first_subpath }}/js/swfobject.js"></script>
+<script type="text/javascript" src="/media-{{ request.path|first_subpath }}/js/amswfobject.js"></script>
+<script type="text/javascript" src="/media-{{ request.path|first_subpath }}/js/json2.js"></script>
+<script language="JavaScript" src="/media-{{ request.path|first_subpath }}/fusioncharts/js/FusionCharts.js"></script>
+
+<script type="text/javascript">
+    
+	//var flashvars = {};  
+	//var params = {wmode:"opaque"};
+	//swfobject.embedSWF("/files_dl/open-flash-chart.swf", "chart", "700", "400", "9.0.0", "", flashvars, params,{});
+	
+    /*
+    comment by lhh, because show will use fusioncharts
+	var so = new SWFObject("/media-{{ request.path|first_subpath }}/amchart/swf/amcolumn.swf",'amcolumn','800','400','8', '#FFFFFF');
+    so.addVariable('settings_file', encodeURIComponent('/media-{{ request.path|first_subpath }}/amchart/settings/amcolumn_settings.xml'));
+    so.addVariable('data_file', encodeURIComponent('/media-{{ request.path|first_subpath }}/amchart/data/empty_data.xml'));
+	so.addParam("wmode", "opaque");
+    so.write('amchart');
+    
+    var flashMovie;
+    
+    function amChartInited(chart_id){
+        flashMovie = document.getElementById("amcolumn");
+    }
+    */
+    
+    var chart = new FusionCharts("/media-{{ request.path|first_subpath }}/fusioncharts/charts/Column2D.swf", "ChartId", "800", "400", "0", "0");
+    chart.setJSONUrl("{% url get_mediatree_chart_fusionchart %}");
+    chart.render("amfusionchart");
+	
+	function reload_amdata(){
+         /*
+        comment by lhh, because show will use fusioncharts
+    		if (flashMovie){
+    			flashMovie.reloadData('/media-{{ request.path|first_subpath }}/amchart/data/mediaeffect_cpc_media.xml');
+    		}
+        */
+        var chart = new FusionCharts("/media-{{ request.path|first_subpath }}/fusioncharts/charts/Column2D.swf", "ChartId", "800", "400", "0", "0");
+        chart.setJSONUrl("{% url get_mediatree_chart_fusionchart %}");
+        chart.render("amfusionchart");
+        
+        var myExportComponent = new FusionChartsExportObject("fcExporter1", "../../FusionCharts/FCExporter.swf");
+
+        //Render the exporter SWF in our DIV fcexpDiv
+        myExportComponent.Render("fcexpDiv");
+	}
+</script>
+
+<script type="text/javascript">
+	init_data = {{ init_data|safe }}
+
+	function ofc_ready(){
+	}
+	
+	function open_flash_chart_data(){
+			return JSON.stringify(init_data);
+		}
+	
+	function findSWF(movieName){
+  		if (navigator.appName.indexOf("Microsoft")!= -1) {
+			return window[movieName];} 
+		else {
+			return document[movieName];
+			}
+	}
+
+	function load_chart(data){
+		tmp = findSWF("chart");
+		//x = tmp.load(JSON.stringify(data));
+		x = tmp.load(data);
+	}
+	
+	OFC = {};
+	
+	OFC.jquery = {
+    name: "jQuery",
+    version: function(src) { return $('#'+ src)[0].get_version() },
+    rasterize: function (src, dst) { $('#'+ dst).replaceWith(OFC.jquery.image(src)) },
+    image: function(src) { return "<img src='data:image/png;base64," + $('#'+src)[0].get_img_binary() + "' />"},
+    popup: function(src) {
+			var img_win = window.open('', 'Charts: Export as Image')
+		    with(img_win.document) {
+            write('<html><head><title>Charts: Export as Image<\/title><\/head><body>' + OFC.jquery.image(src) + '<\/body><\/html>') }
+			// stop the 'loading...' message
+			img_win.document.close();
+		 }
+	}
+	if (typeof(Control == "undefined")) {var Control = {OFC: OFC.jquery}}
+ 
+	// By default, right-clicking on OFC and choosing "save image locally" calls this function.
+	// You are free to change the code in OFC and call my wrapper (Control.OFC.your_favorite_save_method)
+	// function save_image() { alert(1); Control.OFC.popup('my_chart') }
+	function save_image() {OFC.jquery.popup('chart') }
+	function moo() { alert(99); 
+	
+	};	
+
+	var temp_line_up = null;
+	var temp_line_down = null;
+	var temp_bar_up = null;
+	var temp_bar_down = null;
+
+	$(document).ready(function(){
+		
+
+		$("#clients_filter").dialog({
+			bgiframe: true,
+			autoOpen: false,
+			height: 500,
+			width:700,
+			modal: true,
+			buttons: {
+				'清空': function() {		
+					$(":checkbox").each(function(){
+						 this.checked = false;
+						 $(this).attr('disabled', false);
+					});					
+				},
+				'全选': function() {
+					$("#clients_filter .clientbox").each(function(){
+						 this.checked = true;
+					});					
+				},
+				'确定': function() {
+					$(this).dialog('close');
+				}
+			},
+			close: function() {
+				//allFields.val('').removeClass('ui-state-error');
+			}
+		});
+
+		$('#choose_client').click(function() {
+			if ($('#clients_filter').dialog('isOpen'))
+			{
+				$('#clients_filter').dialog('moveToTop');
+			}
+			else{
+			$('#clients_filter').dialog('open');
+			}
+		})
+		.hover(
+			function(){ 
+				$(this).addClass("ui-state-hover"); 
+			},
+			function(){ 
+				$(this).removeClass("ui-state-hover"); 
+			}
+		).mousedown(function(){
+			$(this).addClass("ui-state-active"); 
+		})
+		.mouseup(function(){
+				$(this).removeClass("ui-state-active");
+		});
+
+
+		$("#id_start_day").datepicker();
+		$('#id_start_day').datepicker('option', {dateFormat: 'yy-mm-dd'});
+		$("#id_end_day").datepicker();
+		$('#id_end_day').datepicker('option', {dateFormat: 'yy-mm-dd'});
+		
+		$(".industrybox").click(function(){
+			target = $(this).parent().find(".clientbox")
+			if(this.checked){
+				target.attr('disabled', true).attr('checked', true);
+			}
+			else{
+				target.attr('disabled', false).attr('checked', false);
+			}
+		});
+
+		var industry_list = new Array();
+		var clients_list = new Array();
+
+		function get_boxes(){
+			industry_list.length = 0;
+			clients_list.length = 0;
+
+			$("#clients_filter .industrybox").each(function(){
+				if ( this.checked == true){
+					industry_list.push(this.id);
+				}
+			});
+			
+			$("#clients_filter .clientbox").each(function(){
+				if ( this.checked == true){
+					clients_list.push(this.id);
+				}
+			});
+		};
+		
+		function dd(str,c){
+			return (str.replace(/([\u0391-\uffe5])/ig,'$1a').substring(0,c).replace(/([\u0391-\uffe5])a/ig,'$1')+"<br/>");
+		}
+		
+		global_data = '';
+		firstcat_name = '';
+		subcat_name = '';
+		mediacat_name = '';
+		channel_name = '';
+		flight_name = '';
+
+		
+		$(".parent").live("click",function(){
+			cat_level = $(this).parent().parent().attr('id');
+			$("#"+cat_level+" .parent").removeClass("selected");
+			if ($(this).text() == '全部')
+            {
+                $(this).addClass("selected");
+				firstcat_name = '全部';
+                subcat_name = mediacat_name = channel_name = flight_name = '';
+				return;
+            }
+			switch (cat_level)
+			{
+				case 'maincat':
+					$("#mediacat").hide();$("#channelcat").hide();$("#flightcat").hide();
+					firstcat_name = $(this).children().text();
+					subcat_name = mediacat_name = channel_name = flight_name = '';
+					adjust('subcat');
+					break;
+				case 'subcat':
+					$("#channelcat").hide();$("#flightcat").hide();
+					subcat_name = $(this).children().text();
+					mediacat_name = channel_name = flight_name = '';
+					adjust('mediacat');
+					break;
+				case 'mediacat':
+					$("#flightcat").hide();
+					mediacat_name = $(this).children().text();
+					channel_name = flight_name = '';
+					adjust('channelcat');
+					break;
+				case 'channelcat':
+					channel_name = $(this).children().text();
+					flight_name = '';
+					adjust('flightcat');
+					break;
+				case 'flightcat':
+					flight_name = $(this).children().text();
+					break;	
+			}
+			$(this).addClass("selected");
+
+		});
+		
+		function get_data(cat){  // 获取分类数据
+			data = '';
+			if (cat == 'subcat'){data = global_data[firstcat_name];}
+			else if (cat == 'mediacat'){data = global_data[firstcat_name][subcat_name];}
+			else if (cat == 'channelcat'){data = global_data[firstcat_name][subcat_name][mediacat_name];}
+			else if (cat == 'flightcat'){data = global_data[firstcat_name][subcat_name][mediacat_name][channel_name];}
+			return data;
+		}
+
+		function adjust(cat){   //响应父类别单击事件，调整下一分类的数据
+			$("#"+cat).show();
+			$("#"+cat).empty();
+			html = "<ul class='col'>";
+			if (cat == 'flightcat')
+			{
+				$.each(get_data(cat), function(k, v){
+					html += "<li class='parent'><span>"+v+"</span></li>";
+				});	
+			}
+			else if (cat == 'mediacat'){
+				$.each(get_data(cat), function(k, v){
+					html += "<li class='parent'><span>"+k+"</span></li>";
+				});
+			}
+			else {
+				$.each(get_data(cat), function(k, v){
+					html += "<li class='parent'><span>"+k+"</span></li>";
+				});
+			}
+			html += "</ul>";
+			$("#"+cat).append(html);
+		}	
+		
+		function fillmaincat(data){   // 初始化主分类
+			$("#maincatul").empty();
+			html = "<li class='parent'><span>全部</span></li>";
+			$.each(data, function(k, v){
+				html += "<li class='parent'><span>"+k+"</span></li>";
+			});
+			$("#maincatul").append(html);
+		};
+		
+		$("#addselectmedia").live("click", function(){   // 添加一个媒体选择
+			$("#selectlist").append("<tr><td class='main_box'>"+firstcat_name+"</td><td class='sub_box'>" +subcat_name+"</td><td class='media_box'>" +mediacat_name+"</td><td class='channel_box'>"+channel_name+"</td><td class='flight_box'>"+flight_name+"</td><td><a href='#' class='del'>删除</a></td></tr>");
+		});
+
+		$(".del").live("click",function(){
+			$(this).parent().parent().remove();
+			return false;
+		});
+
+		$("#button_mediafilter").live("click",function(){
+			
+			$("#media_tree").empty();
+
+			$(".col").empty();
+
+			$("#loading").ajaxStart(function(){
+				$(this).show();
+			});
+		
+			$("#loading").ajaxStop(function(){
+				$(this).hide();
+			});
+
+			get_boxes();
+			
+			path = location.pathname.split('/');
+			path[path.length-2] = 'get_mediatree';
+			start_day = $("#id_start_day").val();
+			end_day = $("#id_end_day").val();
+			//$.getJSON(path.join('/'), {start_day:start_day,end_day:end_day,industry_list:industry_list.toString(), clients_list:clients_list.toString()}, function(data){
+			$.post(path.join('/'), {start_day:start_day,end_day:end_day,clients_list:clients_list.toString()}, function(data){
+				if (data.success == false)
+				{
+					$("#media_tree").append("没有相关的媒体");
+				}
+				else
+				{	
+					global_data = data;
+					fillmaincat(data);
+				}
+			},'json');
+			
+		});
+
+		
+
+		
+
+		/*
+		$("#button_mediafilter").click(function(){
+			$("#media_tree").empty();
+			get_boxes();
+			path = location.pathname.split('/');
+			path[path.length-2] = 'get_mediatree';
+			start_day = $("#id_start_day").val();
+			end_day = $("#id_end_day").val();
+			$.getJSON(path.join('/'), {start_day:start_day,end_day:end_day,industry_list:industry_list.toString(), clients_list:clients_list.toString()}, function(data){
+				if (data.success == false)
+				{
+					$("#media_tree").append("没有相关的媒体");
+				}
+				else
+				{	
+					html = ' ';
+					$.each(data, function(k, v){
+						html += "<div>";
+						html += "<p class='main'><input id='"+ k +"'class='main_box' type='checkbox'>"+ k +"</input><input class='buttontree' type='button' value='+'></input></p><div class='mainitems' style='display:none'>";
+						$.each(v, function(kk, vv){
+							html += "<p class='sub'>----<input id='"+ k + "-" + kk +"'class='sub_box' type='checkbox'>"+ kk +"</input><input class='buttontree' type='button' value='+'></input></p><div class='subitems' style='display:none'>";
+							$.each(vv, function(kkk, vvv){
+								html += "<p class='media'>--------<input id='"+ kkk +"'class='media_box' type='checkbox'>"+ kkk +"</input><input class='buttontree' type='button' value='+'></input></p><div class='mediaitems' style='display:none'>";
+								$.each(vvv, function(kkkk, vvvv){
+									html += "<p class='channel'>------------<input id='"+kkk+"-" +kkkk +"' class='channel_box' type='checkbox'>"+ kkkk +"</input><input class='buttontree' type='button' value='+'></input></p><div class='channelitems' style='display:none'>";
+									$.each(vvvv, function(kkkkk, vvvvv){
+										html += "<p class='flight'>----------------<input id='"+kkkk + "-" +vvvvv +"' class='flight_box' type='checkbox'>"+ vvvvv +"</input></p>";
+										});
+									html += "</div>";
+								});
+								html += "</div>";
+							});
+							html += "</div>";
+						});
+						html += "</div></div>";
+					});
+					html += "<h3>4.点击确定生成图表<input id='mediatree_botton' type='button' value='确定'/></h3>"
+					$("#media_tree").append(html);
+					
+				}
+			},'json');
+			
+		});
+		*/
+/*
+		$("#compmedia").click(function(){
+			
+			get_select_boxes();
+
+		});
+
+*/
+		var main_cats_list = new Array();
+		var sub_cats_list = new Array();
+		var media_list = new Array();
+		var channel_list = new Array();
+		var flight_list = new Array();
+
+		function get_select_boxes(){
+			main_cats_list.length = 0;
+			sub_cats_list.length = 0;
+			media_list.length = 0;
+			channel_list.length = 0;
+			flight_list.length = 0;
+			
+			$("#selectlist .main_box").each(function(){
+				if ( $(this).text() != '' && $(this).next().text() == '')
+					{
+						main_cats_list.push($(this).text());
+					}
+			});
+
+			$("#selectlist .sub_box").each(function(){
+				if ( $(this).text() != '' && $(this).next().text() == '')
+					{
+                        //为防止媒体或者频道中含有-，所以用特殊字符进行连接
+						sub_cats_list.push($(this).prev().text() + '$&' +$(this).text());
+					}
+			});
+
+			$("#selectlist .media_box").each(function(){
+				if ( $(this).text() != '' && $(this).next().text() == '')
+					{
+						media_list.push($(this).text());
+					}
+			});
+			
+			$("#selectlist .channel_box").each(function(){
+				if ( $(this).text() != '' && $(this).next().text() == '')
+				{
+                    //为防止媒体或者频道中含有-，所以用特殊字符进行连接
+					channel_list.push($(this).prev().text() + '$&' +$(this).text());
+				}
+	
+			});
+
+			$("#selectlist .flight_box").each(function(){
+				if ( $(this).text() != '')
+				{
+                    //为防止媒体或者频道中含有-，所以用特殊字符进行连接
+					flight_list.push($(this).prev().text() + '$&' +$(this).text());
+				}
+			});
+		};
+
+
+		$("#media_tree .buttontree").live("click", function(){
+			val = $(this).val();
+			target = $(this).parent().next();
+			if (val == '+'){
+				$(this).attr('value', '-');
+				target.show();
+			}else{
+				$(this).attr('value', '+')
+				target.hide();
+			}
+		});
+		
+		
+
+		$("#compmedia").live("click", function(){
+			//$("#chart").empty();
+
+			//$("#loading1").ajaxStart(function(){
+			//	$(this).show();
+			//});
+		
+			//$("#loading1").ajaxStop(function(){
+			//	$(this).hide();
+			//});
+
+			get_select_boxes();
+			//alert(main_cats_list);
+			path = location.pathname.split('/');
+			start_day = $("#id_start_day").val();
+			end_day = $("#id_end_day").val();
+			path[path.length-2] = 'get_mediatree_chart';
+            
+			$.post(path.join('/'), {start_day:start_day,end_day:end_day,main_cats_list:main_cats_list.join('#$%'), sub_cats_list:sub_cats_list.join('#$%'), media_list:media_list.join('#$%'),channel_list:channel_list.join('#$%'),flight_list:flight_list.join('#$%'), clients_list:clients_list.join('#$%')}, function(data){
+				//load_chart(data.bar_up);
+				temp_line_up = data.line_up;
+				temp_line_down = data.line_down;
+				temp_bar_up = data.bar_up;
+				temp_bar_down = data.bar_down;
+				
+				reload_amdata();
+			},'json');
+		});
+
+		
+		$("#linechartbutton").click(function(){	
+			if (temp_line_up != null)
+			{
+				sort = $("input:radio[checked]").val();
+				if(sort == 0){load_chart(temp_line_up);}
+				if(sort == 1){load_chart(temp_line_down);}
+			}
+		});
+
+		$("#barchartbutton").click(function(){
+			if (temp_line_up != null)
+			{
+				sort = $("input:radio[checked]").val();
+				if(sort == 0){load_chart(temp_bar_up);}
+				if(sort == 1){load_chart(temp_bar_down);}
+			}
+		});
+
+		$("#exportxls").click(function(){
+			alert(data.bar_up);
+		});
+			
+	});
+</script>
+{% endblock %}
